@@ -1,0 +1,34 @@
+{
+  "users": [
+    {
+      "name": "Rachel",
+      "surname": "Green",
+      "email": "rachel@friends.com"
+    },
+    {
+      "name": "Chandler",
+      "surname": "Bing",
+      "email": "chandler@friends.com"
+    },
+    {
+      "name": "Monica",
+      "surname": "Geller",
+      "email": "monica@friends.com"
+    },
+    {
+      "name": "Joey",
+      "surname": "Triviani",
+      "email": "joey@friends.com"
+    },
+    {
+      "name": "Phoebe",
+      "surname": "Buffet",
+      "email": "phoebe@friends.com"
+    },
+    {
+      "name": "Ross",
+      "surname": "Geller",
+      "email": "ross@friends.com"
+    }
+  ]
+}
