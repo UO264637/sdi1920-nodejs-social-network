@@ -1,0 +1,9 @@
+{
+  "name": "mysocialnetwork",
+  "description": "Node based social network for Internet Distributed Systems",
+  "version": "0.1.0",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.3"
+  }
+}
