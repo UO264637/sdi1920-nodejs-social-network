@@ -2,6 +2,23 @@
 {% block title %} MSN - Users {% endblock %}
 {% block main %}
 <h2>Users</h2>
+<!-- Búsqueda -->
+<div class="row">
+    <div id="custom-search-input ">
+        <form method="get" action="/users">
+            <div class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-right">
+                <input type="text" class="search-query form-control"
+                       placeholder="Search" name="search"/>
+                <span class="input-group-btn">
+                    <button class="btn" type="submit">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Tabla -->
 <div class="container">
     <div class="table-responsive">
         <!-- Tabla de usuarios de la aplicación -->
@@ -17,7 +34,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Inicio del Bloque Usuarios -->
+            <!-- Inicio del Bloque Usuarios -->
                 {% for user in users %}
                 <tr>
                     <td>{{user.name}}</td>
@@ -25,13 +42,13 @@
                     <td>{{user.email}}</td>
                     <td></td>
                     <td>
-                         <!-- Botón de solicitar amistad -->
-                        <a type="button" class="btn btn-primary addButton" href="" >
+                        <!-- Botón de solicitar amistad -->
+                        <a type="button" class="btn btn-primary addButton" href="">
                             Add Friend
                         </a>
                     </td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
             <!-- Fin del Bloque Usuarios -->
             </tbody>
         </table>
