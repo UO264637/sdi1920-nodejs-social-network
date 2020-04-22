@@ -1,14 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Users</title>
-</head>
-<body>
-    <h1>Users</h1>
-    <ul>
-    {% for user in users %}
-            <li>{{ user.name }} {{user.surname}} - {{ user.email }}</li>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %} MSN - Users {% endblock %}
+{% block main %}
+<h2>Users</h2>
+<div class="container">
+    <div class="table-responsive">
+        <!-- Tabla de usuarios de la aplicación -->
+        <table class="table table-hover" id="tableUsers">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th class="col-md-1"></th>
+                    <!-- Columna de amistad -->
+                    <th class="col-md-1"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Inicio del Bloque Usuarios -->
+                {% for user in users %}
+                <tr>
+                    <td>{{user.name}}</td>
+                    <td>{{user.surname}}</td>
+                    <td>{{user.email}}</td>
+                    <td></td>
+                    <td>
+                         <!-- Botón de solicitar amistad -->
+                        <a type="button" class="btn btn-primary addButton" href="" >
+                            Add Friend
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            <!-- Fin del Bloque Usuarios -->
+            </tbody>
+        </table>
+    </div>
+</div>

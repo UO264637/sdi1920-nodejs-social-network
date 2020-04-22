@@ -3,7 +3,6 @@ module.exports = function(app, swig) {
 
 		const fs = require("fs");
 		let defaultdb = JSON.parse(fs.readFileSync("config/defaultdb.json"));
-		console.log(defaultdb);
 
 		let answer = swig.renderFile("views/users.html", {
 			users: defaultdb.users
