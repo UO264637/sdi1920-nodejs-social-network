@@ -10,13 +10,19 @@ app.use(express.static("public"));						// Sets the static folder
 // Swig
 let swig = require("swig");
 
+// File System
+let fs = require("fs");
+
 // MongoDB
 let mongo = require('mongodb');
+let dbManager = require("./modules/dbManager.js");
+dbManager.init(app, mongo, fs);
 
 // Body Parser
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 
 /*****************************************************************************\
  									VARIABLES
@@ -29,7 +35,7 @@ app.set("db", "mongodb://admin:viade_es4c@mysocialnetwork-shard-00-00-mtis7.mong
  								CONTROLADORES
 \*****************************************************************************/
 
-require("./routes/rusers")(app, swig, mongo);									// Users controller
+require("./routes/rusers")(app, swig, dbManager);									// Users controller
 
 /*****************************************************************************\
  						LANZAMIENTO DEL SERVIDOR

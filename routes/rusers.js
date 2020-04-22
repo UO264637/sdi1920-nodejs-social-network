@@ -1,11 +1,9 @@
-module.exports = function(app, swig) {
+module.exports = function(app, swig, dbManager) {
 	app.get("/users", function(req, res) {
-
-		const fs = require("fs");
-		let defaultdb = JSON.parse(fs.readFileSync("config/defaultdb.json"));
+		dbManager.reset();
 
 		let answer = swig.renderFile("views/users.html", {
-			users: defaultdb.users
+			users: []
 		});
 
 		res.send(answer);
