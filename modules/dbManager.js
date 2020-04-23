@@ -45,7 +45,11 @@ module.exports = {
 		this.clear();
 		// Load the data from the config files
 		let defaultdb = JSON.parse(this.fs.readFileSync("config/defaultdb.json"));
-		defaultdb.users.map((user) => this.insertUser(user, function(){}));
+		// Inserts the users on the database
+		defaultdb.users.map((user) => {
+			user.password = this.app.get("encrypt")(user.password);			// Password encryption
+			this.insertUser(user, function(){})						// User insertion
+		});
 	},
 
 	/**

@@ -1,45 +1,59 @@
 {
   "users": [
     {
+      "name": "Admin",
+      "surname": "Adminson",
+      "email": "admin@email.com",
+      "password": "admin",
+      "role": "ADMIN",
+      "friends": []
+    },
+    {
       "name": "Rachel",
       "surname": "Green",
       "email": "rachel@friends.com",
-      "password": "",
+      "password": "123",
+      "role": "USER",
       "friends": []
     },
     {
       "name": "Chandler",
       "surname": "Bing",
       "email": "chandler@friends.com",
-      "password": "",
+      "password": "123",
+      "role": "USER",
       "friends": []
     },
     {
       "name": "Monica",
       "surname": "Geller",
       "email": "monica@friends.com",
-      "password": "",
+      "password": "123",
+      "role": "USER",
       "friends": []
     },
     {
       "name": "Joey",
       "surname": "Triviani",
       "email": "joey@friends.com",
-      "password": "",
+      "password": "123",
+      "role": "USER",
       "friends": []
     },
     {
       "name": "Phoebe",
       "surname": "Buffet",
       "email": "phoebe@friends.com",
-      "password": "",
+      "password": "123",
+      "role": "USER",
       "friends": []
     },
     {
       "name": "Ross",
       "surname": "Geller",
       "email": "ross@friends.com",
-      "password": "",
+      "password": "123",
+      "role": "USER",
       "friends": []
     }
   ]
