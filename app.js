@@ -6,6 +6,12 @@
 let express = require("express");
 let app = express();
 app.use(express.static("public"));						// Sets the static folder
+let expressSession = require("express-session");
+app.use(expressSession({ 						// Sets the session
+	secret: "abcdefg",
+	resave: true,
+	saveUninitialized: true
+}));
 
 // Swig
 let swig = require("swig");
@@ -14,23 +20,23 @@ let swig = require("swig");
 let fs = require("fs");
 
 // Log4JS
-let log4js = require('log4js');
+let log4js = require("log4js");
 let logger = log4js.getLogger();
-logger.level = 'debug';
+logger.level = "debug";
 logger.debug("Some debug messages");
 
 // MongoDB
-let mongo = require('mongodb');
+let mongo = require("mongodb");
 let dbManager = require("./modules/dbManager.js");
 dbManager.init(app, mongo, fs, logger);
 
 // Body Parser
-let bodyParser = require('body-parser');
+let bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Crypto
-let crypto = require('crypto');
+let crypto = require("crypto");
 
 
 /*****************************************************************************\

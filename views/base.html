@@ -38,8 +38,11 @@
 
 
 <div class="container">
-
-  <!-- Contenido -->
+  <!-- Alerts -->
+  {% for error in errors %}
+    <div class="{{'alert alert-' + error.type}}">{{ error.msg }}</div>
+  {% endfor %}
+  <!-- Content -->
   {% block main %}
     <p>Ups! If you're seeing this, something went wrong.</p>
   {% endblock %}
