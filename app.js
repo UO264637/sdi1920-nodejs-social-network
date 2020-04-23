@@ -45,7 +45,7 @@ let crypto = require("crypto");
 
 app.set("port", 8081);
 app.set("db", "mongodb://admin:viade_es4c@mysocialnetwork-shard-00-00-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-01-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-02-mtis7.mongodb.net:27017/test?ssl=true&replicaSet=MySocialNetwork-shard-0&authSource=admin&retryWrites=true&w=majority");
-app.set("key", "pattern");
+app.set("key", "Patron");
 app.set("encrypt", (object) => {
 	return crypto.createHmac("sha256", app.get("key")).update(object).digest("hex");
 });

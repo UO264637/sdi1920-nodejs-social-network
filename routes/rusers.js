@@ -21,7 +21,7 @@ module.exports = function(app, swig, dbManager) {
 	});
 
 	/**
-	 * List all the users of the application
+	 * List and renders the list of all the users of the application
 	 */
 	app.get("/users", function(req, res) {
 		//dbManager.reset(); // WARNING, this is only to initial test and db load, this does NOT go in here
@@ -39,7 +39,7 @@ module.exports = function(app, swig, dbManager) {
 	 *	Registers the user in the app
 	 */
 	app.post("/signup", function(req, res) {
-		if (checkRegister(req, res)){
+		if (checkValidRegister(req, res)){
 			// User object creation
 			let user = {
 				name: req.body.name,
@@ -51,11 +51,15 @@ module.exports = function(app, swig, dbManager) {
 			};
 			// User insertion
 			dbManager.insertUser(user, function(id) {
-				if (id == null)
+				if (id == null) {
+					req.session.user = null;
 					res.redirect("/signup");
-				else
-					//TODO autologin
+				} else {
+					//TODO login from the database
+					user.id = id;
+					req.session.user = user;
 					res.redirect("/users");
+				}
 			})
 		}
 	});
@@ -64,7 +68,13 @@ module.exports = function(app, swig, dbManager) {
 	 								INPUT CHECKS
 	\*****************************************************************************/
 
-	let checkRegister = (req, res) => {
+	/**
+	 * Checks all the inputs of the register form and redirects to the page in case something is wrong
+	 * @param req			Contains the inputs and session
+	 * @param res			To redirect in case something is wrong
+	 * @returns {boolean}	Assert if there where any errors so the register thread doesn't save the user
+	 */
+	let checkValidRegister = (req, res) => {
 		let errors = [];
 		// Name check
 		if (!req.body.name || req.body.name.length < 3)
@@ -83,9 +93,9 @@ module.exports = function(app, swig, dbManager) {
 		if (req.body.password.length < 3)
 			errors.push({type: "danger", msg: "This password is not secure enough"});
 		// In case any error was committed, it displays back the register page with the errors
-			// It does keep the entered name, surname and email
 		if (errors.length > 0) {
 			req.session.errors = errors;
+			// Stores the name, surname and email the user entered to keep the form filled
 			req.session.inputs = {
 				name: req.body.name,
 				surname: req.body.surname,

@@ -1,57 +1,89 @@
 {
   "users": [
     {
-      "name": "Admin",
-      "surname": "Adminson",
+      "name": "Honor",
+      "surname": "Adonalsiuum",
       "email": "admin@email.com",
       "password": "admin",
       "role": "ADMIN",
       "friends": []
     },
     {
-      "name": "Rachel",
-      "surname": "Green",
-      "email": "rachel@friends.com",
+      "name": "Dalinar",
+      "surname": "Kholin",
+      "email": "dalinar@kholin.com",
       "password": "123",
       "role": "USER",
       "friends": []
     },
     {
-      "name": "Chandler",
-      "surname": "Bing",
-      "email": "chandler@friends.com",
+      "name": "Adolin",
+      "surname": "Kholin",
+      "email": "adolin@kholin.com",
       "password": "123",
       "role": "USER",
       "friends": []
     },
     {
-      "name": "Monica",
-      "surname": "Geller",
-      "email": "monica@friends.com",
+      "name": "Renarin",
+      "surname": "Kholin",
+      "email": "renarin@kholin.com",
       "password": "123",
       "role": "USER",
       "friends": []
     },
     {
-      "name": "Joey",
-      "surname": "Triviani",
-      "email": "joey@friends.com",
+      "name": "Kaladin",
+      "surname": "Stormblessed",
+      "email": "kaladin@bridge4.com",
       "password": "123",
       "role": "USER",
       "friends": []
     },
     {
-      "name": "Phoebe",
-      "surname": "Buffet",
-      "email": "phoebe@friends.com",
+      "name": "Shallan",
+      "surname": "Davar",
+      "email": "shallan@davar.com",
       "password": "123",
       "role": "USER",
       "friends": []
     },
     {
-      "name": "Ross",
-      "surname": "Geller",
-      "email": "ross@friends.com",
+      "name": "Jasnah",
+      "surname": "Kholin",
+      "email": "jasnah@kholin.com",
+      "password": "123",
+      "role": "USER",
+      "friends": []
+    },
+    {
+      "name": "Navani",
+      "surname": "Kholin",
+      "email": "navani@kholin.com",
+      "password": "123",
+      "role": "USER",
+      "friends": []
+    },
+    {
+      "name": "Torol",
+      "surname": "Sadeas",
+      "email": "torol@sadeas.com",
+      "password": "123",
+      "role": "USER",
+      "friends": []
+    },
+    {
+      "name": "Numuhukumakiaki'aialunamor",
+      "surname": "Roca",
+      "email": "roca@bridge4.com",
+      "password": "123",
+      "role": "USER",
+      "friends": []
+    },
+    {
+      "name": "Hoid",
+      "surname": "Sagaz",
+      "email": "hoid@sagaz.com",
       "password": "123",
       "role": "USER",
       "friends": []
