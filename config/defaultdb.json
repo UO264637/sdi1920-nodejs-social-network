@@ -3,32 +3,44 @@
     {
       "name": "Rachel",
       "surname": "Green",
-      "email": "rachel@friends.com"
+      "email": "rachel@friends.com",
+      "password": "",
+      "friends": []
     },
     {
       "name": "Chandler",
       "surname": "Bing",
-      "email": "chandler@friends.com"
+      "email": "chandler@friends.com",
+      "password": "",
+      "friends": []
     },
     {
       "name": "Monica",
       "surname": "Geller",
-      "email": "monica@friends.com"
+      "email": "monica@friends.com",
+      "password": "",
+      "friends": []
     },
     {
       "name": "Joey",
       "surname": "Triviani",
-      "email": "joey@friends.com"
+      "email": "joey@friends.com",
+      "password": "",
+      "friends": []
     },
     {
       "name": "Phoebe",
       "surname": "Buffet",
-      "email": "phoebe@friends.com"
+      "email": "phoebe@friends.com",
+      "password": "",
+      "friends": []
     },
     {
       "name": "Ross",
       "surname": "Geller",
-      "email": "ross@friends.com"
+      "email": "ross@friends.com",
+      "password": "",
+      "friends": []
     }
   ]
 }

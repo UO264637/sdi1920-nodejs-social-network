@@ -13,10 +13,16 @@ let swig = require("swig");
 // File System
 let fs = require("fs");
 
+// Log4JS
+let log4js = require('log4js');
+let logger = log4js.getLogger();
+logger.level = 'debug';
+logger.debug("Some debug messages");
+
 // MongoDB
 let mongo = require('mongodb');
 let dbManager = require("./modules/dbManager.js");
-dbManager.init(app, mongo, fs);
+dbManager.init(app, mongo, fs, logger);
 
 // Body Parser
 let bodyParser = require('body-parser');
