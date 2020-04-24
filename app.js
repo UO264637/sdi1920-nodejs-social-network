@@ -5,7 +5,6 @@
 // Express
 let express = require("express");
 let app = express();
-app.use(express.static("public"));						// Sets the static folder
 let expressSession = require("express-session");
 app.use(expressSession({ 						// Sets the session
 	secret: "abcdefg",
@@ -37,6 +36,37 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Crypto
 let crypto = require("crypto");
+
+/*****************************************************************************\
+ 									ROUTERS
+\*****************************************************************************/
+
+// Checks the user is logged in
+let loggedInRouter = express.Router();
+loggedInRouter.use(function(req, res, next) {
+	if ( req.session.user ) {
+		next();
+	} else {
+		app.get("logger").warn("An anonymous user tried to access " + req.session.destiny);
+		res.redirect("/login");
+	}
+});
+
+// Checks the user is not logged in
+let notLoggedInRouter = express.Router();
+notLoggedInRouter.use(function(req, res, next) {
+	if ( !req.session.user ) {
+		next();
+	} else {
+		app.get("logger").warn("The user " + req.session.user + " tried to access " + req.session.destiny);
+		res.redirect("/");
+	}
+});
+
+app.use("/users*", loggedInRouter);				// Sets the access to the users options (only logged in)
+app.use("/login", notLoggedInRouter);			// Sets the access to the login (only anonymous)
+app.use("/signup", notLoggedInRouter);			// Sets the access to the register (only anonymous)
+app.use(express.static("public"));					// Sets the static folder
 
 
 /*****************************************************************************\
