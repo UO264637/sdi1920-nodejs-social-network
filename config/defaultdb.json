@@ -1,4 +1,14 @@
 {
+  "roles": [
+    {
+      "name": "ADMIN",
+      "privileges": []
+    },
+    {
+      "name": "USER",
+      "privileges": []
+    }
+  ],
   "users": [
     {
       "name": "Honor",

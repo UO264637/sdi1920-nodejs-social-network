@@ -45,6 +45,7 @@ let crypto = require("crypto");
 
 app.set("port", 8081);
 app.set("db", "mongodb://admin:viade_es4c@mysocialnetwork-shard-00-00-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-01-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-02-mtis7.mongodb.net:27017/test?ssl=true&replicaSet=MySocialNetwork-shard-0&authSource=admin&retryWrites=true&w=majority");
+app.set("logger", logger);
 app.set("key", "Patron");
 app.set("encrypt", (object) => {
 	return crypto.createHmac("sha256", app.get("key")).update(object).digest("hex");
@@ -61,16 +62,25 @@ require("./routes/rusers")(app, swig, dbManager);									// Users controller
 \*****************************************************************************/
 
 /**
+ * Shows the homepage
+ */
+app.get("/", function (req, res) {
+	res.send(swig.renderFile("views/home.html", {}));
+});
+
+/**
  * Resets the database and notifies it back
  * ONLY FOR TESTING PURPOSES, DELETE BEFORE DEPLOYMENT
  */
 app.get("/reset", function (req, res) {
-	res.send(dbManager.reset());
+	dbManager.reset();
+	res.send("Database reset invoked");
 });
 
 /*****************************************************************************\
  								SERVER DEPLOYMENT
 \*****************************************************************************/
+
 app.listen(app.get("port"), function() {
-	console.log("Server deployed at http://localhost:" + app.get("port") + "/home");
+	console.log("Server deployed at http://localhost:" + app.get("port") + "/");
 });

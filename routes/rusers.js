@@ -12,7 +12,7 @@ module.exports = function(app, swig, dbManager) {
 		let errors = req.session.errors;
 		req.session.errors = null;
 		let inputs = req.session.inputs;
-		req.session.inputs;
+		req.session.inputs = null;
 		// We render the register page with errors and user inputs
 		res.send(swig.renderFile("views/register.html", {
 			errors: errors,
@@ -24,11 +24,13 @@ module.exports = function(app, swig, dbManager) {
 	 * List and renders the list of all the users of the application
 	 */
 	app.get("/users", function(req, res) {
-		//dbManager.reset(); // WARNING, this is only to initial test and db load, this does NOT go in here
-		let answer = swig.renderFile("views/users.html", {
-			users: []
+		app.get("logger").info("The user " + req.session.user.email + " accessed to the user list");
+		dbManager.cb_get("users", {name: { $ne : "Dalinar" } }, (result) => {
+			let answer = swig.renderFile("views/users.html", {
+				users: result
+			});
+			res.send(answer);
 		});
-		res.send(answer);
 	});
 
 	/*****************************************************************************\
@@ -39,14 +41,25 @@ module.exports = function(app, swig, dbManager) {
 	 *	Registers the user in the app
 	 */
 	app.post("/signup", function(req, res) {
-		if (checkValidRegister(req, res)){
+		checkValidRegister(req).then((errors) =>{
+			// In case of errors, redirects to the register page
+			if (errors.length > 0) {
+				req.session.errors = errors;
+				// Stores some inputs to improve usability
+				req.session.inputs = {
+					name: req.body.name,
+					surname: req.body.surname,
+					email: req.body.email
+				};
+				res.redirect("/signup");
+				return;
+			}
 			// User object creation
 			let user = {
 				name: req.body.name,
 				surname: req.body.surname,
 				email : req.body.email,
 				password : app.get("encrypt")(req.body.password),
-				role: "USER",
 				friends: []
 			};
 			// User insertion
@@ -60,8 +73,8 @@ module.exports = function(app, swig, dbManager) {
 					req.session.user = user;
 					res.redirect("/users");
 				}
-			})
-		}
+			});
+		});
 	});
 
 	/*****************************************************************************\
@@ -74,8 +87,12 @@ module.exports = function(app, swig, dbManager) {
 	 * @param res			To redirect in case something is wrong
 	 * @returns {boolean}	Assert if there where any errors so the register thread doesn't save the user
 	 */
-	let checkValidRegister = (req, res) => {
+	let checkValidRegister = async (req) => {
 		let errors = [];
+		// Email unique check, asynchronous
+		const result = dbManager.get("users", {email: req.body.email}, (result) => {
+			return result;
+		});
 		// Name check
 		if (!req.body.name || req.body.name.length < 3)
 			errors.push({type: "warning", msg: "The name can't be less than three characters long"});
@@ -83,28 +100,18 @@ module.exports = function(app, swig, dbManager) {
 		if (!req.body.surname || req.body.surname.length < 3)
 			errors.push({type: "warning", msg: "The surname can't be less than three characters long"});
 		// Email check
-		if (!req.body.email|| req.body.email.length < 3)
+		if (!req.body.email || req.body.email.length < 3)
 			errors.push({type: "warning", msg: "The entered email is not valid"});
-		//TODO check the email is not repeated <--- cuando se implemente el getUser
-
 		// Password check
 		if (!req.body.password || !req.body.password_repeated || req.body.password !== req.body.password_repeated)
 			errors.push({type: "warning", msg: "The passwords does not match"});
 		if (req.body.password.length < 3)
 			errors.push({type: "danger", msg: "This password is not secure enough"});
-		// In case any error was committed, it displays back the register page with the errors
-		if (errors.length > 0) {
-			req.session.errors = errors;
-			// Stores the name, surname and email the user entered to keep the form filled
-			req.session.inputs = {
-				name: req.body.name,
-				surname: req.body.surname,
-				email: req.body.email
-			};
-			res.redirect("/signup");
-			return false;
-		}
-		return true;
-	}
-
+		return await result.then((result) => {
+			if (result.length > 0)
+				errors.push({type: "warning", msg: "The entered email is already in use"});
+			// Returns the errors collected
+			return errors;
+		}).catch((err) => console.error(err));
+	};
 };
