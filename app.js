@@ -47,7 +47,7 @@ loggedInRouter.use(function(req, res, next) {
 	if ( req.session.user ) {
 		next();
 	} else {
-		app.get("logger").warn("An anonymous user tried to access " + req.session.destiny);
+		app.get("logger").warn("An anonymous user tried to access " + req.originalUrl);
 		res.redirect("/login");
 	}
 });
@@ -58,8 +58,8 @@ notLoggedInRouter.use(function(req, res, next) {
 	if ( !req.session.user ) {
 		next();
 	} else {
-		app.get("logger").warn("The user " + req.session.user + " tried to access " + req.session.destiny);
-		res.redirect("/");
+		app.get("logger").warn("The user " + req.session.user + " tried to access " + req.originalUrl);
+		res.redirect("/users");
 	}
 });
 

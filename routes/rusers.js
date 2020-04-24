@@ -8,8 +8,7 @@ module.exports = function(app, swig, dbManager) {
 	 * Loads the register page
 	 */
 	app.get("/signup", function(req, res) {
-		app.get("logger").info("An anonymous user accessed to the register");
-		const {errors, inputs} = cleanSession(req);
+		const {errors, inputs} = app.cleanSession(req);
 		// We render the register page with the retrieved error and user inputs
 		res.send(swig.renderFile("views/register.html", {
 			errors: errors,
@@ -21,8 +20,7 @@ module.exports = function(app, swig, dbManager) {
 	 * List and renders the list of all the users of the application
 	 */
 	app.get("/users", function(req, res) {
-		app.get("logger").info("The user " + req.session.user + " accessed to the user list");
-		// We want all the users except the current and the admins
+		// We want all the users except the current user and the admins, it should be paginated
 		let query = {
 			email: { $ne : req.session.user },
 			role: { $ne : "ADMIN" },
@@ -44,9 +42,7 @@ module.exports = function(app, swig, dbManager) {
 	 * Loads the login page
 	 */
 	app.get("/login", function(req, res) {
-		app.get("logger").info("An anonymous user accessed to the login form");
-		let errors = req.session.errors;
-		req.session.errors = null;
+		const {errors} = app.cleanSession(req);
 		let answer = swig.renderFile('views/login.html', {errors: errors});
 		res.send(answer);
 	});
@@ -87,7 +83,7 @@ module.exports = function(app, swig, dbManager) {
 					res.redirect("/signup");
 				} else {
 					req.session.user = user.email;
-					app.get("logger").info("The user" + user.email + " has registered and logged in");
+					app.get("logger").info("The user " + user.email + " has registered and logged in");
 					res.redirect("/users");
 				}
 			});
@@ -106,10 +102,10 @@ module.exports = function(app, swig, dbManager) {
 			if (users == null || users.length === 0) {
 				req.session.errors = [{type: "warning", msg: "Incorrect email or password"}];
 				req.session.user = null;
-				app.get("logger").info("The user" + user.email + " has logged in");
 				res.redirect("/login");
 			} else {
 				req.session.user = users[0].email;
+				app.get("logger").info("The user" + req.session.user + " has logged in");
 				res.redirect("/users");
 			}
 		});
