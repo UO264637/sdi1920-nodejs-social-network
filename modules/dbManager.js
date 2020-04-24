@@ -85,4 +85,22 @@ module.exports = {
 		});
 	},
 
+	/**
+	 * Returns the collection of users
+	 * @criterion
+	 * @param callback		Callback function
+	 */
+	getUsers : function(criterion, callback) {
+		this.connect(callback, function(db, logger) {
+			db.collection("users").find(criterion).toArray(function(err, usuarios) {
+				if (err) {
+					callback(null);
+				} else {
+					callback(usuarios);
+				}
+				db.close();
+			});
+		});
+	},
+
 };

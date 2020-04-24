@@ -31,6 +31,16 @@ module.exports = function(app, swig, dbManager) {
 		res.send(answer);
 	});
 
+	/**
+	 * Loads the login page
+	 */
+	app.get("/login", function(req, res) {
+		let mostrarError = req.session.error;
+		let respuesta = swig.renderFile('views/login.html', {error: mostrarError});
+		req.session.error = null;
+		res.send(respuesta);
+	});
+
 	/*****************************************************************************\
  										POST
 	\*****************************************************************************/
@@ -62,6 +72,32 @@ module.exports = function(app, swig, dbManager) {
 				}
 			})
 		}
+	});
+
+	/**
+	 * Logs in the user in the app
+	 */
+	app.post("/login", function(req, res) {
+		let seguro = app.get("encrypt")(req.body.password);
+		let criterio = {
+			email : req.body.email,
+			password : seguro
+		}
+		dbManager.getUsers(criterio, function(usuarios) {
+			if (usuarios == null || usuarios.length == 0) {
+				let error = {
+					mensaje: "Email o password incorrecto",
+					tipoMensaje: "alert-danger"
+				};
+				req.session.error = error;
+				req.session.usuario = null;
+				res.redirect("/login");
+
+			} else {
+				req.session.usuario = usuarios[0].email;
+				res.redirect("/users");
+			}
+		});
 	});
 
 	/*****************************************************************************\
