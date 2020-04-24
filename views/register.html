@@ -1,6 +1,6 @@
 {% extends "base.html" %} 
 
-{% block title %} MSN - Register {% endblock %}
+{% block title %} Register {% endblock %}
 
 {% block main %}
   <h2>Register</h2>
@@ -10,7 +10,7 @@
       <label class="control-label col-sm-2" for="iName">Name:</label>
       <div class="col-sm-10">
         <input type="text" class="form-control" name="name" id="iName"
-               placeholder="John" value="{{ user.name ?? ''}}" required/>
+               placeholder="John" value="{{ inputs.name ?? ''}}" required/>
       </div>
     </div>
     <!-- Surname input field -->
@@ -18,7 +18,7 @@
       <label class="control-label col-sm-2" for="iSurname">Surname:</label>
       <div class="col-sm-10">
         <input type="text" class="form-control" name="surname" id="iSurname"
-               placeholder="Smith" value="{{ user.surname ?? ''}}" required />
+               placeholder="Smith" value="{{ inputs.surname ?? ''}}" required />
       </div>
     </div>
     <!-- Email input field -->
@@ -26,7 +26,7 @@
       <label class="control-label col-sm-2" for="iEmail">Email:</label>
       <div class="col-sm-10">
         <input type="email" class="form-control" name="email" id="iEmail"
-            placeholder="email@email.com" value="{{ user.email ?? ''}}" required />
+            placeholder="email@email.com" value="{{ inputs.email ?? ''}}" required />
       </div>
     </div>
     <!-- Password input field -->

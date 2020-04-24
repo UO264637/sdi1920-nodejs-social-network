@@ -68,10 +68,11 @@ module.exports = {
 	},
 
 	/**
-	 * Asynchronously retrieves the results of a query over a specified collection
+	 * Retrieves the results of a query over a specified collection, returns a promise or executes a callback function
 	 * @param collection		Collection to look
 	 * @param query				Query of the object to retrieve
-	 * @param callback			Callback function
+	 * @param callback			Callback function (optional)
+	 * @return {Promise} 		returns Promise if no callback passed
 	 */
 	get: async function (collection, query, callback) {
 		let logger = this.logger;
@@ -87,20 +88,6 @@ module.exports = {
 				return db.collection(collection).find(query).toArray();
 			}).catch((err) => logger.error(err));
 		}
-	},
-
-	/**
-	 * Asynchronously retrieves the results of a query over a specified collection
-	 * @param collection		Collection to look
-	 * @param query				Query of the object to retrieve
-	 * @param callback			Callback function
-	 */
-	cb_get: function (collection, query, callback) {
-		this.connect(callback, (db) => {
-			db.collection(collection).find(query).toArray((err, result) => {
-				(err) ? callback(null) : callback(result);
-			});
-		});
 	},
 
 	/*****************************************************************************\
@@ -122,24 +109,6 @@ module.exports = {
 					logger.info("New user inserted in the database: " + user.email + " (" + result.ops[0]._id + ")");
 					callback(result.ops[0]._id);
 				}})
-		});
-	},
-
-	/**
-	 * Returns the collection of users
-	 * @criterion
-	 * @param callback		Callback function
-	 */
-	getUsers : function(criterion, callback) {
-		this.connect(callback, function(db, logger) {
-			db.collection("users").find(criterion).toArray(function(err, usuarios) {
-				if (err) {
-					callback(null);
-				} else {
-					callback(usuarios);
-				}
-				db.close();
-			});
 		});
 	},
 

@@ -47,9 +47,31 @@ app.set("port", 8081);
 app.set("db", "mongodb://admin:viade_es4c@mysocialnetwork-shard-00-00-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-01-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-02-mtis7.mongodb.net:27017/test?ssl=true&replicaSet=MySocialNetwork-shard-0&authSource=admin&retryWrites=true&w=majority");
 app.set("logger", logger);
 app.set("key", "Patron");
-app.set("encrypt", (object) => {
-	return crypto.createHmac("sha256", app.get("key")).update(object).digest("hex");
-});
+
+/**
+ * Retrieves the info stored on the session and clears it afterwards
+ * @param req			Object containing the session
+ * @returns {{
+ * 		inputs: *, 		User inputs to refill
+ * 		errors: *		Errors to print alerts
+ * 	}}
+ */
+app.cleanSession = (req) => {
+	let errors = req.session.errors;
+	req.session.errors = null;
+	let inputs = req.session.inputs;
+	req.session.inputs = null;
+	return {errors, inputs};
+};
+
+/**
+ * Encrypts the specified string
+ * @param string	String to encrypt
+ * @returns 		Encrypted string
+ */
+app.encrypt = (string) => {
+	return crypto.createHmac("sha256", app.get("key")).update(string).digest("hex");
+};
 
 /*****************************************************************************\
  									CONTROLLERS

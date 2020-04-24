@@ -8,12 +8,9 @@ module.exports = function(app, swig, dbManager) {
 	 * Loads the register page
 	 */
 	app.get("/signup", function(req, res) {
-		// We save and clear the errors and user stored inputs
-		let errors = req.session.errors;
-		req.session.errors = null;
-		let inputs = req.session.inputs;
-		req.session.inputs = null;
-		// We render the register page with errors and user inputs
+		app.get("logger").info("An anonymous user accessed to the register");
+		const {errors, inputs} = cleanSession(req);
+		// We render the register page with the retrieved error and user inputs
 		res.send(swig.renderFile("views/register.html", {
 			errors: errors,
 			inputs: inputs
@@ -24,8 +21,13 @@ module.exports = function(app, swig, dbManager) {
 	 * List and renders the list of all the users of the application
 	 */
 	app.get("/users", function(req, res) {
-		app.get("logger").info("The user " + req.session.user.email + " accessed to the user list");
-		dbManager.get("users", {name: { $ne : "Dalinar" } }, (result) => {
+		app.get("logger").info("The user " + req.session.user + " accessed to the user list");
+		// We want all the users except the current and the admins
+		let query = {
+			email: { $ne : req.session.user },
+			role: { $ne : "ADMIN" },
+		};
+		dbManager.get("users", query, (result) => {
 			let answer = swig.renderFile("views/users.html", {
 				users: result
 			});
@@ -37,10 +39,11 @@ module.exports = function(app, swig, dbManager) {
 	 * Loads the login page
 	 */
 	app.get("/login", function(req, res) {
-		let mostrarError = req.session.error;
-		let respuesta = swig.renderFile('views/login.html', {error: mostrarError});
-		req.session.error = null;
-		res.send(respuesta);
+		app.get("logger").info("An anonymous user accessed to the login form");
+		let errors = req.session.errors;
+		req.session.errors = null;
+		let answer = swig.renderFile('views/login.html', {errors: errors});
+		res.send(answer);
 	});
 
 	/*****************************************************************************\
@@ -69,7 +72,7 @@ module.exports = function(app, swig, dbManager) {
 				name: req.body.name,
 				surname: req.body.surname,
 				email : req.body.email,
-				password : app.get("encrypt")(req.body.password),
+				password : app.encrypt(req.body.password),
 				friends: []
 			};
 			// User insertion
@@ -78,9 +81,8 @@ module.exports = function(app, swig, dbManager) {
 					req.session.user = null;
 					res.redirect("/signup");
 				} else {
-					//TODO login from the database
-					user.id = id;
-					req.session.user = user;
+					req.session.user = user.email;
+					app.get("logger").info("The user" + user.email + " has registered and logged in");
 					res.redirect("/users");
 				}
 			});
@@ -91,23 +93,18 @@ module.exports = function(app, swig, dbManager) {
 	 * Logs in the user in the app
 	 */
 	app.post("/login", function(req, res) {
-		let seguro = app.get("encrypt")(req.body.password);
-		let criterio = {
+		let query = {
 			email : req.body.email,
-			password : seguro
-		}
-		dbManager.getUsers(criterio, function(usuarios) {
-			if (usuarios == null || usuarios.length == 0) {
-				let error = {
-					mensaje: "Email o password incorrecto",
-					tipoMensaje: "alert-danger"
-				};
-				req.session.error = error;
-				req.session.usuario = null;
+			password : app.encrypt(req.body.password),
+		};
+		dbManager.get("users", query, function(users) {
+			if (users == null || users.length === 0) {
+				req.session.errors = [{type: "warning", msg: "Incorrect email or password"}];
+				req.session.user = null;
+				app.get("logger").info("The user" + user.email + " has logged in");
 				res.redirect("/login");
-
 			} else {
-				req.session.usuario = usuarios[0].email;
+				req.session.user = users[0].email;
 				res.redirect("/users");
 			}
 		});
@@ -118,9 +115,8 @@ module.exports = function(app, swig, dbManager) {
 	\*****************************************************************************/
 
 	/**
-	 * Checks all the inputs of the register form and redirects to the page in case something is wrong
+	 * Checks all the inputs of the register form and returns all the errors
 	 * @param req			Contains the inputs and session
-	 * @param res			To redirect in case something is wrong
 	 * @returns {boolean}	Assert if there where any errors so the register thread doesn't save the user
 	 */
 	let checkValidRegister = async (req) => {
