@@ -32,7 +32,6 @@ module.exports = {
 				callback(null);
 			} else {
 				operation(db, logger);
-				db.close();
 			}
 		});
 	},
@@ -46,10 +45,11 @@ module.exports = {
 		let defaultdb = JSON.parse(this.fs.readFileSync("config/defaultdb.json"));
 
 		// Clears the users collection and fills it again
-		this.clear("users", () => {
+		this.clear("users", (db) => {
 			defaultdb.users.forEach((user) => {
 				user.password = this.app.get("encrypt")(user.password);			// Password encryption
-				this.insertUser(user, () => {})							// User insertion
+				this.insertUser(user, () => {});						// User insertion
+				db.close();
 			});
 		});
 	},
@@ -62,7 +62,7 @@ module.exports = {
 	clear: function(collection, callback) {
 		this.connect(callback, function (db, logger) {
 			db.collection(collection).remove();				// Clears the specified collection
-			callback();
+			callback(db);
 			logger.info("The database has been cleared. The database is now empty.");
 		});
 	},
@@ -80,6 +80,7 @@ module.exports = {
 			this.connect(callback, (db) => {
 				db.collection(collection).find(query).toArray((err, result) => {
 					(err) ? callback(null) : callback(result);
+					db.close();
 				});
 			});
 		}
@@ -88,6 +89,26 @@ module.exports = {
 				return db.collection(collection).find(query).toArray();
 			}).catch((err) => logger.error(err));
 		}
+	},
+
+	/**
+	 * Retrieves the results of a query over a specified collection, based on a page
+	 * @param collection		Collection to look
+	 * @param query				Query of the object to retrieve
+	 * @param pg				Page to get
+	 * @param callback			Callback function
+	 */
+	getPg : function(collection, query, pg, callback){
+		this.connect(callback, function(db) {
+			let col = db.collection(collection);
+			col.count(query, function(err, count) {
+				col.find(query).skip((pg-1)*5).limit(5).toArray(
+					function(err, users) {
+						(err) ? callback(null) : callback(users, count);
+						db.close();
+					});
+			});
+		});
 	},
 
 	/*****************************************************************************\
@@ -108,7 +129,9 @@ module.exports = {
 				} else {
 					logger.info("New user inserted in the database: " + user.email + " (" + result.ops[0]._id + ")");
 					callback(result.ops[0]._id);
-				}})
+				}
+				db.close();
+			})
 		});
 	},
 

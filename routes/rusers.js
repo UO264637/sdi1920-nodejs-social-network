@@ -27,9 +27,14 @@ module.exports = function(app, swig, dbManager) {
 			email: { $ne : req.session.user },
 			role: { $ne : "ADMIN" },
 		};
-		dbManager.get("users", query, (result) => {
+		let pg = req.query.pg ? parseInt(req.query.pg) : 1;
+		dbManager.getPg("users", query, pg, (result, count) => {
+			let pages = [];
+			for (let i = pg-2; i<=pg+2; i++) pages.push(i);
 			let answer = swig.renderFile("views/users.html", {
-				users: result
+				users: result,
+				pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
+				current: pg
 			});
 			res.send(answer);
 		});
