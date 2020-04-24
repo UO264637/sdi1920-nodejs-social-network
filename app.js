@@ -57,6 +57,18 @@ app.set("encrypt", (object) => {
 require("./routes/rusers")(app, swig, dbManager);									// Users controller
 
 /*****************************************************************************\
+ 										GET
+\*****************************************************************************/
+
+/**
+ * Resets the database and notifies it back
+ * ONLY FOR TESTING PURPOSES, DELETE BEFORE DEPLOYMENT
+ */
+app.get("/reset", function (req, res) {
+	res.send(dbManager.reset());
+});
+
+/*****************************************************************************\
  								SERVER DEPLOYMENT
 \*****************************************************************************/
 app.listen(app.get("port"), function() {

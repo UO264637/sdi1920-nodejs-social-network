@@ -50,6 +50,7 @@ module.exports = {
 			user.password = this.app.get("encrypt")(user.password);			// Password encryption
 			this.insertUser(user, function(){})						// User insertion
 		});
+		return "Database reset successful";
 	},
 
 	/**
