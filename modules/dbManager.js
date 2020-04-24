@@ -71,12 +71,22 @@ module.exports = {
 	 * Asynchronously retrieves the results of a query over a specified collection
 	 * @param collection		Collection to look
 	 * @param query				Query of the object to retrieve
+	 * @param callback			Callback function
 	 */
-	get: async function (collection, query) {
+	get: async function (collection, query, callback) {
 		let logger = this.logger;
-		return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
-			return db.collection(collection).find(query).toArray();
-		}).catch((err) => logger.error(err));
+		if (callback) {				// Specifying a callback calls the operation with it
+			this.connect(callback, (db) => {
+				db.collection(collection).find(query).toArray((err, result) => {
+					(err) ? callback(null) : callback(result);
+				});
+			});
+		}
+		else { 						// Without callback the function returns a promise
+			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
+				return db.collection(collection).find(query).toArray();
+			}).catch((err) => logger.error(err));
+		}
 	},
 
 	/**

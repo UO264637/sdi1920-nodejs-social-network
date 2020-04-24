@@ -25,7 +25,7 @@ module.exports = function(app, swig, dbManager) {
 	 */
 	app.get("/users", function(req, res) {
 		app.get("logger").info("The user " + req.session.user.email + " accessed to the user list");
-		dbManager.cb_get("users", {name: { $ne : "Dalinar" } }, (result) => {
+		dbManager.get("users", {name: { $ne : "Dalinar" } }, (result) => {
 			let answer = swig.renderFile("views/users.html", {
 				users: result
 			});
@@ -126,9 +126,7 @@ module.exports = function(app, swig, dbManager) {
 	let checkValidRegister = async (req) => {
 		let errors = [];
 		// Email unique check, asynchronous
-		const result = dbManager.get("users", {email: req.body.email}, (result) => {
-			return result;
-		});
+		const result = dbManager.get("users", {email: req.body.email});
 		// Name check
 		if (!req.body.name || req.body.name.length < 3)
 			errors.push({type: "warning", msg: "The name can't be less than three characters long"});
