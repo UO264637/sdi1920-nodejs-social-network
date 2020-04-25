@@ -44,36 +44,34 @@ app.use(bodyParser.urlencoded({ extended: true }));
 let crypto = require("crypto");
 
 /*****************************************************************************\
- 									ROUTERS
+ 								MIDDLEWARE
 \*****************************************************************************/
+
+let logAccess = (req, res, next) => {
+	app.get("logger").info("%s attempted: %s %s",
+		req.session.user ? req.session.user : "Anonymous user", req.method,  req.originalUrl);
+	next();
+};
+
+let sessionChecker = (req, res, next) => {
+	req.session.user ? next() : res.redirect("/login");
+};
+
+let anonChecker = (req, res, next) => {
+	req.session.user ? res.redirect("/users") : next();
+};
 
 // Checks the user is logged in
 let authRouter = express.Router();
-authRouter.use(function(req, res, next) {
-	if ( req.session.user ) {
-		app.get("logger").info("The user " + req.session.user + " accessed " + req.originalUrl);
-		next();
-	} else {
-		app.get("logger").warn("An anonymous user tried to access " + req.originalUrl);
-		res.redirect("/login");
-	}
-});
+authRouter.use(logAccess, sessionChecker);
 
 // Checks the user is not logged in
 let anonRouter = express.Router();
-anonRouter.use(function(req, res, next) {
-	if ( !req.session.user ) {
-		app.get("logger").info("An anonymous user accessed " + req.originalUrl);
-		next();
-	} else {
-		app.get("logger").warn("The user " + req.session.user + " tried to access " + req.originalUrl);
-		res.redirect("/users");
-	}
-});
+anonRouter.use(logAccess, anonChecker);
 
-app.use("/users*", authRouter);				// Sets the access to the users options (only logged in)
 app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
+app.use("/users", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use(express.static("public"));				// Sets the static folder
 
 
@@ -122,17 +120,18 @@ require("./routes/rusers")(app, swig, dbManager);									// Users controller
 \*****************************************************************************/
 
 /**
- * Shows the homepage
+ * Redirects the user to the login when accessing the route
+ * If it's already logged, the anonRoute will redirect it to the users
  */
-app.get("/", function (req, res) {
-	res.send(swig.renderFile("views/home.html", {}));
+app.get("/", logAccess, (req, res) => {
+	res.redirect("login");
 });
 
 /**
  * Resets the database and notifies it back
  * ONLY FOR TESTING PURPOSES, DELETE BEFORE DEPLOYMENT
  */
-app.get("/reset", function (req, res) {
+app.get("/reset", (req, res) => {
 	dbManager.reset();
 	res.send("Database reset invoked");
 });
