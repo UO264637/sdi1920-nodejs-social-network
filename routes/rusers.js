@@ -20,11 +20,31 @@ module.exports = function(app, swig, dbManager) {
 	 * List and renders the list of all the users of the application
 	 */
 	app.get("/users", function(req, res) {
+		let query ={};
 		// We want all the users except the current user and the admins, it should be paginated
-		let query = {
-			email: { $ne : req.session.user },
-			role: { $ne : "ADMIN" },
-		};
+		if( req.query.search != null ){
+			query = {
+				$and: [
+					{
+						$or: [
+							{"name" : {$regex : ".*"+req.query.search+".*"}},
+							{"surname" : {$regex : ".*"+req.query.search+".*"}},
+							{"email" : {$regex : ".*"+req.query.search+".*"}}
+						]
+					},
+					{
+						email: {$ne: req.session.user},
+						role: {$ne: "ADMIN"}
+					}
+				]
+			};
+		}
+		else {
+			query = {
+				email: {$ne: req.session.user},
+				role: {$ne: "ADMIN"}
+			};
+		}
 		let pg = req.query.pg ? parseInt(req.query.pg) : 1;
 		dbManager.getPg("users", query, pg, (result, count) => {
 			let pages = [];
@@ -32,7 +52,8 @@ module.exports = function(app, swig, dbManager) {
 			let answer = swig.renderFile("views/users.html", {
 				users: result,
 				pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
-				current: pg
+				current: pg,
+				search: req.query.search
 			});
 			res.send(answer);
 		});
