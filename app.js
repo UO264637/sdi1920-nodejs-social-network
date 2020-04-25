@@ -12,6 +12,12 @@ app.use(expressSession({ 						// Sets the session
 	saveUninitialized: true
 }));
 
+// middleware to make 'user' available to all templates
+app.use(function(req, res, next) {
+	res.locals.user = req.session.user;
+	next();
+});
+
 // Swig
 let swig = require("swig");
 

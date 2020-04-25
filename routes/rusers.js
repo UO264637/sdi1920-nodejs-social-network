@@ -47,6 +47,16 @@ module.exports = function(app, swig, dbManager) {
 		res.send(answer);
 	});
 
+	/**
+	 * Disconnects the user
+	 */
+	app.get('/logout', function (req, res) {
+		req.session.usuario = null;
+		const {errors} = app.cleanSession(req);
+		let answer = swig.renderFile('views/login.html', {errors: errors});
+		res.send(answer);
+	})
+
 	/*****************************************************************************\
  										POST
 	\*****************************************************************************/
