@@ -35,16 +35,16 @@
             </thead>
             <tbody>
             <!-- Start of the users block -->
-                {% for user in users %}
+                {% for u in userList %}
                 <tr>
-                    <td>{{user.name}}</td>
-                    <td>{{user.surname}}</td>
-                    <td>{{user.email}}</td>
+                    <td>{{u.name}}</td>
+                    <td>{{u.surname}}</td>
+                    <td>{{u.email}}</td>
                     <td></td>
                     <td>
                         <!-- Botón de solicitar amistad -->
                         <a type="button" class="btn btn-primary addButton" href="">
-                            Add Friend
+                            <span class="glyphicon glyphicon-plus"></span> Add Friend
                         </a>
                     </td>
                 </tr>

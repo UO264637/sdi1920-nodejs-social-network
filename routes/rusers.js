@@ -10,7 +10,7 @@ module.exports = function(app, swig, dbManager) {
 	app.get("/signup", function(req, res) {
 		const {errors, inputs} = app.cleanSession(req);
 		// We render the register page with the retrieved error and user inputs
-		res.send(swig.renderFile("views/register.html", {
+		res.send(app.generateView("views/register.html", req.session, {
 			errors: errors,
 			inputs: inputs
 		}));
@@ -22,35 +22,31 @@ module.exports = function(app, swig, dbManager) {
 	app.get("/users", function(req, res) {
 		let query ={};
 		// We want all the users except the current user and the admins, it should be paginated
-		if( req.query.search != null ){
+		if( req.query.search != null ){				// In case there's a search
 			query = {
-				$and: [
-					{
+				$and: [ {
 						$or: [
 							{"name" : {$regex : ".*"+req.query.search+".*"}},
 							{"surname" : {$regex : ".*"+req.query.search+".*"}},
-							{"email" : {$regex : ".*"+req.query.search+".*"}}
-						]
-					},
-					{
+							{"email" : {$regex : ".*"+req.query.search+".*"}} ]
+					}, {
 						email: {$ne: req.session.user},
 						role: {$ne: "ADMIN"}
-					}
-				]
+					}]
 			};
-		}
-		else {
+		} else {									// If there's no search
 			query = {
 				email: {$ne: req.session.user},
 				role: {$ne: "ADMIN"}
 			};
 		}
+		// Query consult and pagination set up
 		let pg = req.query.pg ? parseInt(req.query.pg) : 1;
 		dbManager.getPg("users", query, pg, (result, count) => {
 			let pages = [];
 			for (let i = pg-2; i<=pg+2; i++) pages.push(i);
-			let answer = swig.renderFile("views/users.html", {
-				users: result,
+			let answer = app.generateView("views/users.html", req.session,{
+				userList: result,
 				pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
 				current: pg,
 				search: req.query.search
@@ -64,8 +60,7 @@ module.exports = function(app, swig, dbManager) {
 	 */
 	app.get("/login", function(req, res) {
 		const {errors} = app.cleanSession(req);
-		let answer = swig.renderFile('views/login.html', {errors: errors});
-		res.send(answer);
+		res.send(app.generateView("views/login.html", req.session, {errors: errors}));
 	});
 
 	/**

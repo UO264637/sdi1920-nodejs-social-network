@@ -101,6 +101,18 @@ app.cleanSession = (req) => {
 };
 
 /**
+ * Makes the call to Swig combining session and params
+ * @param file		File to render
+ * @param session	Session to extract user
+ * @param params	Object with extra params
+ */
+app.generateView = (file, session, params) => {
+	params = params ? params : {};
+	params.user = session.user;
+	return swig.renderFile(file, params);
+};
+
+/**
  * Encrypts the specified string
  * @param string	String to encrypt
  * @returns 		Encrypted string
