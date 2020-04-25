@@ -48,9 +48,10 @@ let crypto = require("crypto");
 \*****************************************************************************/
 
 // Checks the user is logged in
-let loggedInRouter = express.Router();
-loggedInRouter.use(function(req, res, next) {
+let authRouter = express.Router();
+authRouter.use(function(req, res, next) {
 	if ( req.session.user ) {
+		app.get("logger").info("The user " + req.session.user + " accessed " + req.originalUrl);
 		next();
 	} else {
 		app.get("logger").warn("An anonymous user tried to access " + req.originalUrl);
@@ -59,9 +60,10 @@ loggedInRouter.use(function(req, res, next) {
 });
 
 // Checks the user is not logged in
-let notLoggedInRouter = express.Router();
-notLoggedInRouter.use(function(req, res, next) {
+let anonRouter = express.Router();
+anonRouter.use(function(req, res, next) {
 	if ( !req.session.user ) {
+		app.get("logger").info("An anonymous user accessed " + req.originalUrl);
 		next();
 	} else {
 		app.get("logger").warn("The user " + req.session.user + " tried to access " + req.originalUrl);
@@ -69,10 +71,10 @@ notLoggedInRouter.use(function(req, res, next) {
 	}
 });
 
-app.use("/users*", loggedInRouter);				// Sets the access to the users options (only logged in)
-app.use("/login", notLoggedInRouter);			// Sets the access to the login (only anonymous)
-app.use("/signup", notLoggedInRouter);			// Sets the access to the register (only anonymous)
-app.use(express.static("public"));					// Sets the static folder
+app.use("/users*", authRouter);				// Sets the access to the users options (only logged in)
+app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
+app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
+app.use(express.static("public"));				// Sets the static folder
 
 
 /*****************************************************************************\
