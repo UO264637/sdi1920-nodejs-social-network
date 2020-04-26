@@ -62,19 +62,30 @@ module.exports = function(app, dbManager) {
 				role: {$ne: "ADMIN"}
 			};
 		}
-		// Query consult and pagination set up
+		// Query consult to get the page users
 		let pg = req.query.pg ? parseInt(req.query.pg) : 1;
 		dbManager.getPg("users", query, pg, (result, count) => {
-			let pages = [];
-			for (let i = pg-2; i<=pg+2; i++) pages.push(i);
-			let answer = app.generateView("views/user/list.html", req.session,{
-				userList: result,
-				pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
-				current: pg,
-				search: req.query.search,
-				alerts: alerts
+			// Load the current user to know their friendships
+			dbManager.get("users", {email: req.session.user}, (current) => {
+				current = current[0];
+				// Check the relationship of the user with the current
+				result.forEach((user) => {
+					// Check they are friends
+					if (current.friends.map((friend) => friend.toString()).includes(user._id.toString())) {
+						user.isFriend = true;
+					}
+				});
+				let pages = [];
+				for (let i = pg-2; i<=pg+2; i++) pages.push(i);
+				let answer = app.generateView("views/user/list.html", req.session,{
+					userList: result,
+					pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
+					current: pg,
+					search: req.query.search,
+					alerts: alerts
+				});
+				res.send(answer);
 			});
-			res.send(answer);
 		});
 	});
 
