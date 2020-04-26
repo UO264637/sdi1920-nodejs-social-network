@@ -12,11 +12,13 @@
   "users": [
     {
       "name": "Honor",
-      "surname": "Adonalsiuum",
+      "surname": "Adonalsium",
       "email": "admin@email.com",
       "password": "admin",
       "role": "ADMIN",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Dalinar",
@@ -24,7 +26,9 @@
       "email": "dalinar@kholin.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Adolin",
@@ -32,7 +36,9 @@
       "email": "adolin@kholin.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Renarin",
@@ -40,7 +46,9 @@
       "email": "renarin@kholin.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Kaladin",
@@ -48,7 +56,9 @@
       "email": "kaladin@bridge4.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Shallan",
@@ -56,7 +66,9 @@
       "email": "shallan@davar.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Jasnah",
@@ -64,7 +76,9 @@
       "email": "jasnah@kholin.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Navani",
@@ -72,7 +86,9 @@
       "email": "navani@kholin.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Torol",
@@ -80,7 +96,9 @@
       "email": "torol@sadeas.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Numuhukumakiaki'aialunamor",
@@ -88,7 +106,9 @@
       "email": "roca@bridge4.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
     },
     {
       "name": "Hoid",
@@ -96,7 +116,19 @@
       "email": "hoid@sagaz.com",
       "password": "123",
       "role": "USER",
-      "friends": []
+      "friends": [
+
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "from": "hoid@sagaz.com",
+      "to": "dalinar@kholin.com"
+    },
+    {
+      "from": "hoid@sagaz.com",
+      "to": "navani@kholin.com"
     }
   ]
 }

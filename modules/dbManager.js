@@ -42,15 +42,33 @@ module.exports = {
 	reset: function() {
 		this.logger.info("Reset of the database invoked");
 		// Loads the data from the config files
-		let defaultdb = JSON.parse(this.fs.readFileSync("config/defaultdb.json"));
+		let {users, requests} = JSON.parse(this.fs.readFileSync("config/defaultdb.json"));
 
-		// Clears the users collection and fills it again
+		// Call for the deletion of users
 		this.clear("users", (db) => {
-			defaultdb.users.forEach((user) => {
-				user.password = this.app.get("encrypt")(user.password);			// Password encryption
-				this.insertUser(user, () => {});						// User insertion
+			// Encryption of the password
+			users.forEach((user) => user.password = this.app.encrypt(user.password));
+			// Insertion of the users
+			this.insert("users", users).then(() => {
+				// Deletion of requests
+				this.clear("requests", (db) => {
+					// Loads the user id into each request
+					Promise.all(requests.map(async (request) => {
+						let pFrom = this.get("users", {email: request.from});
+						let pTo = this.get("users", {email: request.to});
+						return Promise.all([pFrom, pTo]).then((results) => {
+							return {
+								from: this.mongo.ObjectID(results[0][0]._id),
+								to: this.mongo.ObjectID(results[1][0]._id)
+							};
+						}).catch((err) => console.log(err));
+					// Insertion of the requests
+					})).then((requests) => this.insert("requests", requests))
+						.catch((err) => console.log(err));
+				});
 				db.close();
 			});
+			db.close();
 		});
 	},
 
@@ -62,8 +80,8 @@ module.exports = {
 	clear: function(collection, callback) {
 		this.connect(callback, function (db, logger) {
 			db.collection(collection).remove();				// Clears the specified collection
+			logger.info("The collection " + collection + "has been cleared.");
 			callback(db);
-			logger.info("The database has been cleared. The database is now empty.");
 		});
 	},
 
@@ -109,6 +127,13 @@ module.exports = {
 					});
 			});
 		});
+	},
+
+	insert: async function (collection, input) {
+		let logger = this.logger;
+		return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
+			return db.collection(collection).insert(input);
+		}).catch((err) => logger.error(err));
 	},
 
 	/*****************************************************************************\

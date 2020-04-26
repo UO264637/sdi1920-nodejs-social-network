@@ -1,25 +1,47 @@
-module.exports = function(app, swig, dbManager) {
+module.exports = function(app, dbManager) {
 
 	/*****************************************************************************\
  										GET
 	\*****************************************************************************/
 
+	//------------------------------- SESSION --------------------------------------
+
 	/**
 	 * Loads the register page
 	 */
 	app.get("/signup", function(req, res) {
-		const {errors, inputs} = app.cleanSession(req);
+		const {alerts, inputs} = app.cleanSession(req);
 		// We render the register page with the retrieved error and user inputs
 		res.send(app.generateView("views/register.html", req.session, {
-			errors: errors,
+			alerts: alerts,
 			inputs: inputs
 		}));
 	});
 
 	/**
+	 * Loads the login page
+	 */
+	app.get("/login", function(req, res) {
+		const {alerts} = app.cleanSession(req);
+		res.send(app.generateView("views/login.html", req.session, {alerts: alerts}));
+	});
+
+	/**
+	 * Disconnects the user
+	 */
+	app.get('/logout', function (req, res) {
+		app.cleanSession(req);
+		req.session.user = null;
+		res.redirect("/login");
+	});
+
+	//------------------------------- USER --------------------------------------
+
+	/**
 	 * List and renders the list of all the users of the application
 	 */
-	app.get("/users", function(req, res) {
+	app.get("/users", (req, res) => {
+		const {alerts} = app.cleanSession(req);
 		let query ={};
 		// We want all the users except the current user and the admins, it should be paginated
 		if( req.query.search != null ){				// In case there's a search
@@ -45,31 +67,15 @@ module.exports = function(app, swig, dbManager) {
 		dbManager.getPg("users", query, pg, (result, count) => {
 			let pages = [];
 			for (let i = pg-2; i<=pg+2; i++) pages.push(i);
-			let answer = app.generateView("views/users.html", req.session,{
+			let answer = app.generateView("views/user/list.html", req.session,{
 				userList: result,
 				pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
 				current: pg,
-				search: req.query.search
+				search: req.query.search,
+				alerts: alerts
 			});
 			res.send(answer);
 		});
-	});
-
-	/**
-	 * Loads the login page
-	 */
-	app.get("/login", function(req, res) {
-		const {errors} = app.cleanSession(req);
-		res.send(app.generateView("views/login.html", req.session, {errors: errors}));
-	});
-
-	/**
-	 * Disconnects the user
-	 */
-	app.get('/logout', function (req, res) {
-		app.cleanSession(req);
-		req.session.user = null;
-		res.redirect("/login");
 	});
 
 	/*****************************************************************************\
@@ -83,7 +89,7 @@ module.exports = function(app, swig, dbManager) {
 		checkValidRegister(req).then((errors) =>{
 			// In case of errors, redirects to the register page
 			if (errors.length > 0) {
-				req.session.errors = errors;
+				req.session.alerts = errors;
 				// Stores some inputs to improve usability
 				req.session.inputs = {
 					name: req.body.name,
@@ -112,7 +118,7 @@ module.exports = function(app, swig, dbManager) {
 					res.redirect("/users");
 				}
 			});
-		});
+		}).catch((err) => console.error(err));
 	});
 
 	/**
@@ -125,7 +131,7 @@ module.exports = function(app, swig, dbManager) {
 		};
 		dbManager.get("users", query, function(users) {
 			if (users == null || users.length === 0) {
-				req.session.errors = [{type: "warning", msg: "Incorrect email or password"}];
+				req.session.alerts = [{type: "warning", msg: "Incorrect email or password"}];
 				req.session.user = null;
 				res.redirect("/login");
 			} else {
@@ -142,8 +148,8 @@ module.exports = function(app, swig, dbManager) {
 
 	/**
 	 * Checks all the inputs of the register form and returns all the errors
-	 * @param req			Contains the inputs and session
-	 * @returns {boolean}	Assert if there where any errors so the register thread doesn't save the user
+	 * @param req							Contains the inputs and session
+	 * @returns {Promise<alerts|void>}		Alerts with the errors found
 	 */
 	let checkValidRegister = async (req) => {
 		let errors = [];
@@ -170,4 +176,5 @@ module.exports = function(app, swig, dbManager) {
 			return errors;
 		}).catch((err) => console.error(err));
 	};
+
 };

@@ -72,6 +72,7 @@ anonRouter.use(logAccess, anonChecker);
 app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
 app.use("/users", authRouter);				// Sets the access to the rest of the app (only auth)
+app.use("/friend/*", authRouter);
 app.use(express.static("public"));				// Sets the static folder
 
 
@@ -93,11 +94,11 @@ app.set("key", "Patron");
  * 	}}
  */
 app.cleanSession = (req) => {
-	let errors = req.session.errors;
-	req.session.errors = null;
+	let alerts = req.session.alerts;
+	req.session.alerts = null;
 	let inputs = req.session.inputs;
 	req.session.inputs = null;
-	return {errors, inputs};
+	return {alerts, inputs};
 };
 
 /**
@@ -125,7 +126,8 @@ app.encrypt = (string) => {
  									CONTROLLERS
 \*****************************************************************************/
 
-require("./routes/rusers")(app, swig, dbManager);									// Users controller
+require("./routes/rusers")(app, dbManager);									// Users controller
+require("./routes/rfriends")(app, dbManager);								// Friends controller
 
 /*****************************************************************************\
  										GET

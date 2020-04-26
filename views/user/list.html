@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "..\base.html" %}
 {% block title %} Users {% endblock %}
 {% block main %}
 <h2>Users</h2>
@@ -43,7 +43,7 @@
                     <td></td>
                     <td>
                         <!-- Botón de solicitar amistad -->
-                        <a type="button" class="btn btn-primary addButton" href="">
+                        <a type="button" class="btn btn-primary addButton" href="/friend/add/{{u.email}}">
                             <span class="glyphicon glyphicon-plus"></span> Add Friend
                         </a>
                     </td>
