@@ -7,14 +7,21 @@ module.exports = function(app, dbManager) {
 	app.get("/friend/add/:id", (req, res) => {
 		checkValidFriendRequest(req.session.user, req.params.id).then(results => {
 			let {alerts, user, userToAdd} = results;
-			console.log(alerts);
 			// In case of errors, redirects to the register page
 			if (alerts.length > 0) {
 				req.session.alerts = alerts;
 				res.redirect("/users");
 				return;
 			}
-			res.send("Esto por aquí de momento tira");
+			// Creation of the requests
+			let request = {
+				from: dbManager.mongo.ObjectId(user._id),
+				to: dbManager.mongo.ObjectId(userToAdd._id)
+			};
+			dbManager.insert("requests", request, () => {
+				req.session.alerts = [{type: "info", msg: "The friend request successfully sent"}];
+				res.redirect("/users");
+			})
 		}).catch((err) => console.error(err));
 	});
 

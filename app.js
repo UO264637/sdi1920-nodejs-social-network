@@ -146,7 +146,8 @@ app.get("/", logAccess, (req, res) => {
  * ONLY FOR TESTING PURPOSES, DELETE BEFORE DEPLOYMENT
  */
 app.get("/reset", (req, res) => {
-	dbManager.reset();
+	// Calls the reset operation with the parsed file of default data
+	dbManager.reset(JSON.parse(fs.readFileSync("config/defaultdb.json")));
 	res.send("Database reset invoked");
 });
 

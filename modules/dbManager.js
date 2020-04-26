@@ -2,21 +2,15 @@ module.exports = {
 
 	mongo : null,
 	app : null,
-	fs: null,
-	logger: null,
 
 	/**
 	 * Initializes the database manager object
 	 * @param app		The app object, it does contain the token to connect to the database
 	 * @param mongo		MongoDB object, to make the database operations
-	 * @param fs		Fyle System object, to load the default configs
-	 * @param logger	Log4JS object, to log the operations
 	 */
-	init : function(app, mongo, fs, logger) {
+	init : function(app, mongo) {
 		this.mongo = mongo;
 		this.app = app;
-		this.fs = fs;
-		this.logger = logger;
 	},
 
 	/**
@@ -25,65 +19,45 @@ module.exports = {
 	 * @param operation					Operation to do in the database when connected
 	 */
 	connect: function (callback, operation) {
-		let logger = this.logger;
 		this.mongo.MongoClient.connect(this.app.get("db"), function (err, db) {
 			if (err) {
-				logger.error("Unable to connect to the database");
+				console.log("Unable to connect to the database");
 				callback(null);
 			} else {
-				operation(db, logger);
+				operation(db);
 			}
 		});
 	},
 
-	/**
-	 * Clears the database and inserts the default data
-	 */
-	reset: function() {
-		this.logger.info("Reset of the database invoked");
-		// Loads the data from the config files
-		let {users, requests} = JSON.parse(this.fs.readFileSync("config/defaultdb.json"));
-
-		// Call for the deletion of users
-		this.clear("users", (db) => {
-			// Encryption of the password
-			users.forEach((user) => user.password = this.app.encrypt(user.password));
-			// Insertion of the users
-			this.insert("users", users).then(() => {
-				// Deletion of requests
-				this.clear("requests", (db) => {
-					// Loads the user id into each request
-					Promise.all(requests.map(async (request) => {
-						let pFrom = this.get("users", {email: request.from});
-						let pTo = this.get("users", {email: request.to});
-						return Promise.all([pFrom, pTo]).then((results) => {
-							return {
-								from: this.mongo.ObjectID(results[0][0]._id),
-								to: this.mongo.ObjectID(results[1][0]._id)
-							};
-						}).catch((err) => console.log(err));
-					// Insertion of the requests
-					})).then((requests) => this.insert("requests", requests))
-						.catch((err) => console.log(err));
-				});
-				db.close();
-			});
-			db.close();
-		});
-	},
+	/*****************************************************************************\
+	 									CREATE
+	\*****************************************************************************/
 
 	/**
-	 * Clears the specified collection and calls to the next step
-	 * @param collection				Name of the collection to clear
-	 * @param callback					Callback function
+	 * Inserts the input into the specified collection
+	 * @param collection					Collection to look
+	 * @param input							Object(s) to insert in the collection
+	 * @param callback						Callback function (optional)
+	 * @returns {Promise<Promise | void>}	returns Promise if no callback passed
 	 */
-	clear: function(collection, callback) {
-		this.connect(callback, function (db, logger) {
-			db.collection(collection).remove();				// Clears the specified collection
-			logger.info("The collection " + collection + "has been cleared.");
-			callback(db);
-		});
+	insert: async function (collection, input, callback) {
+		if (callback) {				// Specifying a callback calls the operation with it
+			this.connect(callback, function(db) {
+				db.collection(collection).insert(input, function(err, result) {
+					(err) ? callback(null) : callback(result.ops[0]._id);
+					db.close();
+				})
+			});}
+		else { 						// Without callback the function returns a promise
+			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
+				return db.collection(collection).insert(input);
+			}).catch((err) => console.log(err));
+		}
 	},
+
+	/*****************************************************************************\
+	 									READ
+	\*****************************************************************************/
 
 	/**
 	 * Retrieves the results of a query over a specified collection, returns a promise or executes a callback function
@@ -93,19 +67,17 @@ module.exports = {
 	 * @return {Promise} 		returns Promise if no callback passed
 	 */
 	get: async function (collection, query, callback) {
-		let logger = this.logger;
 		if (callback) {				// Specifying a callback calls the operation with it
 			this.connect(callback, (db) => {
 				db.collection(collection).find(query).toArray((err, result) => {
 					(err) ? callback(null) : callback(result);
 					db.close();
 				});
-			});
-		}
+			}); }
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
 				return db.collection(collection).find(query).toArray();
-			}).catch((err) => logger.error(err));
+			}).catch((err) => console.log(err));
 		}
 	},
 
@@ -129,34 +101,54 @@ module.exports = {
 		});
 	},
 
-	insert: async function (collection, input) {
-		let logger = this.logger;
-		return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
-			return db.collection(collection).insert(input);
-		}).catch((err) => logger.error(err));
-	},
-
 	/*****************************************************************************\
- 										USERS
+	 								DATABASE RESET
 	\*****************************************************************************/
 
 	/**
-	 * Inserts the user into the collection of users
-	 * @param user			User to insert in the database
-	 * @param callback		Callback function
+	 * Clears the specified collection and calls to the next step
+	 * @param collection				Name of the collection to clear
+	 * @param callback					Callback function
 	 */
-	insertUser : function (user, callback) {
-		this.connect(callback, function(db, logger) {
-			db.collection("users").insert(user, function(err, result) {
-				if (err) {
-					logger.error("Unable to insert " + user);
-					callback(null);
-				} else {
-					logger.info("New user inserted in the database: " + user.email + " (" + result.ops[0]._id + ")");
-					callback(result.ops[0]._id);
-				}
-				db.close();
-			})
+	clear: function(collection, callback) {
+		this.connect(callback, function (db) {
+			db.collection(collection).remove();				// Clears the specified collection
+			callback(db);
+		});
+	},
+
+	/**
+	 * Clears the database and inserts the default data
+	 */
+	reset: function(defaultb) {
+		// Loads the data from the config files
+		let {users, requests} = defaultb;
+
+		// Deletion of users, when done inserts them again and their related data
+		this.clear("users", (db) => {
+			// Encryption of the password
+			users.forEach((user) => user.password = this.app.encrypt(user.password));
+			// Insertion of the users
+			this.insert("users", users).then(() => {
+				// Deletion of requests
+				this.clear("requests", (db) => {
+					// Loads the user ids into each request
+					Promise.all(requests.map(async (request) => {
+						let pFrom = this.get("users", {email: request.from});
+						let pTo = this.get("users", {email: request.to});
+						return Promise.all([pFrom, pTo]).then((results) => {
+							return {
+								from: this.mongo.ObjectID(results[0][0]._id),
+								to: this.mongo.ObjectID(results[1][0]._id)
+							};
+						}).catch((err) => console.log(err));
+						// Insertion of the requests
+					})).then((requests) => this.insert("requests", requests))
+						.catch((err) => console.log(err));
+					db.close();
+				});
+			});
+			db.close();
 		});
 	},
 

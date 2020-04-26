@@ -108,7 +108,7 @@ module.exports = function(app, dbManager) {
 				friends: []
 			};
 			// User insertion
-			dbManager.insertUser(user, function(id) {
+			dbManager.insert("user", user, function(id) {
 				if (id == null) {
 					req.session.user = null;
 					res.redirect("/signup");
