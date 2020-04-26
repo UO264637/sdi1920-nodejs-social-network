@@ -85,11 +85,11 @@ module.exports = function(app, dbManager) {
 		// Starts the load of the pending requests
 		return dbManager.get("requests", {
 			$or: [ {
-				from: dbManager.mongo.ObjectId(userId),
-				to: dbManager.mongo.ObjectId(userToAddId)
+				from: userId,
+				to: userToAddId
 			}, {
-				from: dbManager.mongo.ObjectId(userToAddId),
-				to: dbManager.mongo.ObjectId(userId)
+				from: userToAddId,
+				to: userId
 			}]
 		}).then((results) => {
 			return (results.length > 0) ?

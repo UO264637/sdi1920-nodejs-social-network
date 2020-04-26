@@ -69,22 +69,36 @@ module.exports = function(app, dbManager) {
 			dbManager.get("users", {email: req.session.user}, (current) => {
 				current = current[0];
 				// Check the relationship of the user with the current
-				result.forEach((user) => {
+				Promise.all(result.map(async (user) => {
 					// Check they are friends
 					if (current.friends.map((friend) => friend.toString()).includes(user._id.toString())) {
 						user.isFriend = true;
+						return user;
+					} else {
+						// Load the possible requests
+						let pSent = dbManager.get("requests", {from: current._id, to: user._id});
+						let pReceived = dbManager.get("requests", {from: user._id, to: current._id});
+						// Check there's an already pending friend request
+						return Promise.all([pSent, pReceived]).then((results) => {
+							user.sent = results[0].length > 0;
+							user.received = results[1].length > 0;
+							return user;
+						}).catch((err) => console.log(err));
 					}
-				});
-				let pages = [];
-				for (let i = pg-2; i<=pg+2; i++) pages.push(i);
-				let answer = app.generateView("views/user/list.html", req.session,{
-					userList: result,
-					pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
-					current: pg,
-					search: req.query.search,
-					alerts: alerts
-				});
-				res.send(answer);
+				})).then((result) => {
+					// Prepares the pagination
+					let pages = [];
+					for (let i = pg-2; i<=pg+2; i++) pages.push(i);
+					// Sends the page
+					let answer = app.generateView("views/user/list.html", req.session,{
+						userList: result,
+						pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
+						current: pg,
+						search: req.query.search,
+						alerts: alerts
+					});
+					res.send(answer);
+				}).catch((err) => console.log(err));
 			});
 		});
 	});
