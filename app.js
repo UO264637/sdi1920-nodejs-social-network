@@ -43,6 +43,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Crypto
 let crypto = require("crypto");
 
+// Jsonwebtoken
+var jwt = require('jsonwebtoken');
+app.set('jwt',jwt);
+
 /*****************************************************************************\
  								MIDDLEWARE
 \*****************************************************************************/
@@ -60,6 +64,37 @@ let sessionChecker = (req, res, next) => {
 let anonChecker = (req, res, next) => {
 	req.session.user ? res.redirect("/users") : next();
 };
+let hasToken = (req, res, next) => {
+	var token = req.headers["token"] || req.body.token || req.query.token;
+	if (token != null) {
+		next();
+	} else {
+		res.status(403); // Forbidden
+		res.json({
+			access : false,
+			message: 'No Token'
+		});
+	}
+};
+
+let tokenChecker = (req, res, next) => {
+	var token = req.headers["token"] || req.body.token || req.query.token;
+	// Verify token
+	jwt.verify(token, "secret123", function(err, infoToken) {
+		if (err || (Date.now()/1000 - infoToken.tiempo) > 240 ){
+			res.status(403); // Forbidden
+			res.json({
+				access : false,
+				error: "Invalid or timed out token"
+			});
+			return;
+
+		} else {
+			res.usuario = infoToken.usuario;
+			next();
+		}
+	});
+};
 
 // Checks the user is logged in
 let authRouter = express.Router();
@@ -69,11 +104,16 @@ authRouter.use(logAccess, sessionChecker);
 let anonRouter = express.Router();
 anonRouter.use(logAccess, anonChecker);
 
+// Checks the user token is valid
+var userTokenRouter = express.Router();
+userTokenRouter.use(hasToken, tokenChecker);
+
 app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
 app.use("/users", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use("/friend/*", authRouter);
 app.use(express.static("public"));				// Sets the static folder
+app.use('/api/users', userTokenRouter);
 
 
 /*****************************************************************************\
@@ -128,6 +168,7 @@ app.encrypt = (string) => {
 
 require("./routes/rusers")(app, dbManager);									// Users controller
 require("./routes/rfriends")(app, dbManager);								// Friends controller
+require("./routes/rapisocial")(app, dbManager);
 
 /*****************************************************************************\
  										GET
