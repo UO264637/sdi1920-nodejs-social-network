@@ -36,6 +36,25 @@ module.exports = function(app, dbManager) {
 		}).catch((err) => console.error(err));
 	});
 
+	app.get("/friend/requests", (req, res) => {
+		// Load the user
+		dbManager.get("users", {email: req.session.user}, (result) => {
+			if (result == null)
+				console.log("Unable to retrieve the current user");
+			else {
+				// Loads the incoming requests
+				dbManager.get("requests", {to: result[0]._id}, (result) => {
+					// Loads the senders of those requests
+					dbManager.get("users", {_id: {$in: result.map((request) => request.from)}}, (result) => {
+						// Sends the page with the list
+						res.send(app.generateView("views/friend/requests.html", req.session, {
+							friends: result
+						}));
+					});
+				});
+			}});
+	});
+
 	/*****************************************************************************\
 	 								INPUT CHECKS
 	\*****************************************************************************/
