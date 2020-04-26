@@ -1,0 +1,52 @@
+{% extends "..\base.html" %}
+{% block title %} Requests {% endblock %}
+{% block main %}
+<h2>Friend requests</h2>
+<!-- Tabla -->
+<div class="container">
+    <div class="table-responsive">
+        <!-- Table of friend requests -->
+        <table class="table table-hover" id="tableUsers">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th class="col-md-1"></th>
+                    <!-- Friendship column -->
+                    <th class="col-md-1"></th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- Start of the users block -->
+                {% for f in friends %}
+                <tr>
+                    <td>{{f.name}}</td>
+                    <td>{{f.surname}}</td>
+                    <td></td>
+                    <td>
+                        <!-- Accept button -->
+                        <a type="button" class="btn btn-success" href="#">
+                            <span class="glyphicon glyphicon-ok"></span> Accept
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            <!-- End of the users block -->
+            </tbody>
+        </table>
+    </div>
+    <!-- Pagination -->
+    <div class="row text-center">
+        <ul class="pagination">
+            {% for page in pages %}
+            <li class="page-item" id="pi-{{page}}">
+                <a class="page-link" href="/users?pg={{page}}">
+                    {{page}}
+                </a>
+            </li>
+            {% endfor %}
+            <script>$("#pi-{{current}}").addClass("active")</script>
+        </ul>
+    </div>
+</div>
+{% endblock %}
