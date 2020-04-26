@@ -12,12 +12,6 @@ app.use(expressSession({ 						// Sets the session
 	saveUninitialized: true
 }));
 
-// middleware to make 'user' available to all templates
-app.use(function(req, res, next) {
-	res.locals.user = req.session.user;
-	next();
-});
-
 // Swig
 let swig = require("swig");
 
@@ -43,27 +37,39 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Crypto
 let crypto = require("crypto");
 
-// Jsonwebtoken
-var jwt = require('jsonwebtoken');
-app.set('jwt',jwt);
+// JsonWebToken
+let jwt = require('jsonwebtoken');
 
 /*****************************************************************************\
  								MIDDLEWARE
 \*****************************************************************************/
 
+/**
+ * Register the access of the user in the log
+ */
 let logAccess = (req, res, next) => {
 	app.get("logger").info("%s attempted: %s %s",
 		req.session.user ? req.session.user : "Anonymous user", req.method,  req.originalUrl);
 	next();
 };
 
+/**
+ * Checks the authentication of the user to protect private routes
+ */
 let sessionChecker = (req, res, next) => {
 	req.session.user ? next() : res.redirect("/login");
 };
 
+/**
+ * Checks the no authentication of the user to protect anonymous routes
+ */
 let anonChecker = (req, res, next) => {
 	req.session.user ? res.redirect("/users") : next();
 };
+
+/**
+ * Checks the petition has a token
+ */
 let hasToken = (req, res, next) => {
 	let token = req.headers["token"] || req.body.token || req.query.token;
 	if (token != null) {
@@ -77,10 +83,13 @@ let hasToken = (req, res, next) => {
 	}
 };
 
+/**
+ * Verifies the token
+ */
 let tokenChecker = (req, res, next) => {
 	let token = req.headers["token"] || req.body.token || req.query.token;
 	// Verify token
-	jwt.verify(token, "secret123", function(err, infoToken) {
+	jwt.verify(token, "stormfather", function(err, infoToken) {
 		if (err || (Date.now()/1000 - infoToken.tiempo) > 240 ){
 			res.status(403); // Forbidden
 			res.json({
@@ -89,7 +98,7 @@ let tokenChecker = (req, res, next) => {
 			});
 			return;
 		} else {
-			res.usuario = infoToken.usuario;
+			res.user = infoToken.user;
 			next();
 		}
 	});
@@ -104,15 +113,15 @@ let anonRouter = express.Router();
 anonRouter.use(logAccess, anonChecker);
 
 // Checks the user token is valid
-var userTokenRouter = express.Router();
+let userTokenRouter = express.Router();
 userTokenRouter.use(hasToken, tokenChecker);
 
 app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
+app.use('/api/users', userTokenRouter);		// Sets the api access
 app.use("/users", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use("/friend/*", authRouter);
 app.use(express.static("public"));				// Sets the static folder
-app.use('/api/users', userTokenRouter);
 
 
 /*****************************************************************************\
@@ -123,6 +132,7 @@ app.set("port", 8081);
 app.set("db", "mongodb://admin:viade_es4c@mysocialnetwork-shard-00-00-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-01-mtis7.mongodb.net:27017,mysocialnetwork-shard-00-02-mtis7.mongodb.net:27017/test?ssl=true&replicaSet=MySocialNetwork-shard-0&authSource=admin&retryWrites=true&w=majority");
 app.set("logger", logger);
 app.set("key", "Patron");
+app.set('jwt', jwt);
 
 /**
  * Retrieves the info stored on the session and clears it afterwards
@@ -167,7 +177,7 @@ app.encrypt = (string) => {
 
 require("./routes/rusers")(app, dbManager);									// Users controller
 require("./routes/rfriends")(app, dbManager);								// Friends controller
-require("./routes/rapisocial")(app, dbManager);
+require("./routes/rapisocial")(app, dbManager);								// API controller
 
 /*****************************************************************************\
  										GET
