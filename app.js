@@ -65,7 +65,7 @@ let anonChecker = (req, res, next) => {
 	req.session.user ? res.redirect("/users") : next();
 };
 let hasToken = (req, res, next) => {
-	var token = req.headers["token"] || req.body.token || req.query.token;
+	let token = req.headers["token"] || req.body.token || req.query.token;
 	if (token != null) {
 		next();
 	} else {
@@ -78,7 +78,7 @@ let hasToken = (req, res, next) => {
 };
 
 let tokenChecker = (req, res, next) => {
-	var token = req.headers["token"] || req.body.token || req.query.token;
+	let token = req.headers["token"] || req.body.token || req.query.token;
 	// Verify token
 	jwt.verify(token, "secret123", function(err, infoToken) {
 		if (err || (Date.now()/1000 - infoToken.tiempo) > 240 ){
@@ -88,7 +88,6 @@ let tokenChecker = (req, res, next) => {
 				error: "Invalid or timed out token"
 			});
 			return;
-
 		} else {
 			res.usuario = infoToken.usuario;
 			next();
