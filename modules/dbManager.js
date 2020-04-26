@@ -62,7 +62,7 @@ module.exports = {
 	/**
 	 * Retrieves the results of a query over a specified collection, returns a promise or executes a callback function
 	 * @param collection		Collection to look
-	 * @param query				Query of the object to retrieve
+	 * @param query				Query of the object(s) to retrieve
 	 * @param callback			Callback function (optional)
 	 * @return {Promise} 		returns Promise if no callback passed
 	 */
@@ -84,7 +84,7 @@ module.exports = {
 	/**
 	 * Retrieves the results of a query over a specified collection, based on a page
 	 * @param collection		Collection to look
-	 * @param query				Query of the object to retrieve
+	 * @param query				Query of the object(s) to retrieve
 	 * @param pg				Page to get
 	 * @param callback			Callback function
 	 */
@@ -99,6 +99,33 @@ module.exports = {
 					});
 			});
 		});
+	},
+
+	/*****************************************************************************\
+	 									UPDATE
+	\*****************************************************************************/
+
+	/**
+	 * Updates the collection based on the query and input
+	 * @param collection					Collection to update
+	 * @param query							Query of the object(s) to update
+	 * @param input							Update to apply
+	 * @param callback						Callback function
+	 * @returns {Promise<Promise | void>}	returns Promise if no callback passed
+	 */
+	update: async function (collection, query, input, callback) {
+		if (callback) {				// Specifying a callback calls the operation with it
+			this.connect(callback, function(db) {
+				db.collection(collection).update(query, {$set: input}, function(err, result) {
+					(err) ? callback(null) : callback(result);
+					db.close();
+				})
+			});}
+		else { 						// Without callback the function returns a promise
+			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
+				return db.collection(collection).update(query, {$set: input});
+			}).catch((err) => console.log(err));
+		}
 	},
 
 	/*****************************************************************************\
@@ -146,6 +173,21 @@ module.exports = {
 					})).then((requests) => this.insert("requests", requests))
 						.catch((err) => console.log(err));
 					db.close();
+				});
+				// Load all the users
+				this.get("users", {}, (users) => {
+					users.forEach((user) => {
+						// Change the email for their ids
+						Promise.all(user.friends.map(async (friendId) => {
+							return this.get("users", {email: friendId}).then((result) => {
+								return result[0]._id;
+						})})).then((friends) => {
+							// Updates the users
+							user.friends = friends;
+							console.log(user);
+							this.update("users", { email: user.email }, user);
+						}).catch((err) => console.log(err));
+					})
 				});
 			});
 			db.close();

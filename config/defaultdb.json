@@ -37,7 +37,12 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "adolin@kholin.com",
+        "renarin@kholin.com",
+        "kaladin@bridge4.com",
+        "shallan@davar.com",
+        "jasnah@kholin.com",
+        "navani@kholin.com"
       ]
     },
     {
@@ -47,7 +52,12 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "dalinar@kholin.com",
+        "renarin@kholin.com",
+        "kaladin@bridge4.com",
+        "shallan@davar.com",
+        "jasnah@kholin.com",
+        "navani@kholin.com"
       ]
     },
     {
@@ -57,7 +67,12 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "adolin@kholin.com",
+        "dalinar@kholin.com",
+        "kaladin@bridge4.com",
+        "shallan@davar.com",
+        "jasnah@kholin.com",
+        "navani@kholin.com"
       ]
     },
     {
@@ -67,7 +82,12 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "adolin@kholin.com",
+        "renarin@kholin.com",
+        "dalinar@kholin.com",
+        "shallan@davar.com",
+        "navani@kholin.com",
+        "roca@bridge4.com"
       ]
     },
     {
@@ -77,7 +97,11 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "adolin@kholin.com",
+        "renarin@kholin.com",
+        "dalinar@kholin.com",
+        "jasnah@kholin.com",
+        "kaladin@bridge4.com"
       ]
     },
     {
@@ -87,7 +111,10 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "adolin@kholin.com",
+        "renarin@kholin.com",
+        "dalinar@kholin.com",
+        "navani@kholin.com"
       ]
     },
     {
@@ -97,7 +124,11 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "adolin@kholin.com",
+        "renarin@kholin.com",
+        "dalinar@kholin.com",
+        "jasnah@kholin.com",
+        "kaladin@bridge4.com"
       ]
     },
     {
@@ -117,7 +148,7 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
+        "kaladin@bridge4.com"
       ]
     },
     {
@@ -126,6 +157,16 @@
       "email": "hoid@sagaz.com",
       "password": "123",
       "role": "USER",
+      "friends": [
+
+      ]
+    },
+    {
+      "name": "Kame",
+      "surname": "Patata",
+      "email": "cocotero@amarillo",
+      "password": "123",
+      "role": "ADMIN",
       "friends": [
 
       ]
@@ -138,6 +179,30 @@
     },
     {
       "from": "hoid@sagaz.com",
+      "to": "adolin@kholin.com"
+    },
+    {
+      "from": "hoid@sagaz.com",
+      "to": "renarin@kholin.com"
+    },
+    {
+      "from": "hoid@sagaz.com",
+      "to": "kaladin@bridge4.com"
+    },
+    {
+      "from": "hoid@sagaz.com",
+      "to": "shallan@davar.com"
+    },
+    {
+      "from": "hoid@sagaz.com",
+      "to": "navani@kholin.com"
+    },
+    {
+      "from": "hoid@sagaz.com",
+      "to": "jasnah@kholin.com"
+    },
+    {
+      "from": "shallan@davar.com",
       "to": "navani@kholin.com"
     }
   ]

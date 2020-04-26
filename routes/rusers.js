@@ -42,9 +42,9 @@ module.exports = function(app, dbManager) {
 	 */
 	app.get("/users", (req, res) => {
 		const {alerts} = app.cleanSession(req);
-		let query ={};
+		let query = {};
 		// We want all the users except the current user and the admins, it should be paginated
-		if( req.query.search != null ){				// In case there's a search
+		if( req.query.search != null ) {				// In case there's a search
 			query = {
 				$and: [ {
 						$or: [
@@ -56,25 +56,50 @@ module.exports = function(app, dbManager) {
 						role: {$ne: "ADMIN"}
 					}]
 			};
-		} else {									// If there's no search
+		} else {										// If there's no search
 			query = {
 				email: {$ne: req.session.user},
 				role: {$ne: "ADMIN"}
 			};
 		}
-		// Query consult and pagination set up
+		// Query consult to get the page users
 		let pg = req.query.pg ? parseInt(req.query.pg) : 1;
 		dbManager.getPg("users", query, pg, (result, count) => {
-			let pages = [];
-			for (let i = pg-2; i<=pg+2; i++) pages.push(i);
-			let answer = app.generateView("views/user/list.html", req.session,{
-				userList: result,
-				pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
-				current: pg,
-				search: req.query.search,
-				alerts: alerts
+			// Load the current user to know their friendships
+			dbManager.get("users", {email: req.session.user}, (current) => {
+				current = current[0];
+				// Check the relationship of the user with the current
+				Promise.all(result.map(async (user) => {
+					// Check they are friends
+					if (current.friends.map((friend) => friend.toString()).includes(user._id.toString())) {
+						user.isFriend = true;
+						return user;
+					} else {
+						// Load the possible requests
+						let pSent = dbManager.get("requests", {from: current._id, to: user._id});
+						let pReceived = dbManager.get("requests", {from: user._id, to: current._id});
+						// Check there's an already pending friend request
+						return Promise.all([pSent, pReceived]).then((results) => {
+							user.sent = results[0].length > 0;
+							user.received = results[1].length > 0;
+							return user;
+						}).catch((err) => console.log(err));
+					}
+				})).then((result) => {
+					// Prepares the pagination
+					let pages = [];
+					for (let i = pg-2; i<=pg+2; i++) pages.push(i);
+					// Sends the page
+					let answer = app.generateView("views/user/list.html", req.session,{
+						userList: result,
+						pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
+						current: pg,
+						search: req.query.search,
+						alerts: alerts
+					});
+					res.send(answer);
+				}).catch((err) => console.log(err));
 			});
-			res.send(answer);
 		});
 	});
 
@@ -136,7 +161,7 @@ module.exports = function(app, dbManager) {
 				res.redirect("/login");
 			} else {
 				req.session.user = users[0].email;
-				app.get("logger").info("The user" + req.session.user + " has logged in");
+				app.get("logger").info("The user " + req.session.user + " has logged in");
 				res.redirect("/users");
 			}
 		});
