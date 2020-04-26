@@ -42,9 +42,9 @@ module.exports = function(app, dbManager) {
 	 */
 	app.get("/users", (req, res) => {
 		const {alerts} = app.cleanSession(req);
-		let query ={};
+		let query = {};
 		// We want all the users except the current user and the admins, it should be paginated
-		if( req.query.search != null ){				// In case there's a search
+		if( req.query.search != null ) {				// In case there's a search
 			query = {
 				$and: [ {
 						$or: [
@@ -56,7 +56,7 @@ module.exports = function(app, dbManager) {
 						role: {$ne: "ADMIN"}
 					}]
 			};
-		} else {									// If there's no search
+		} else {										// If there's no search
 			query = {
 				email: {$ne: req.session.user},
 				role: {$ne: "ADMIN"}
@@ -136,7 +136,7 @@ module.exports = function(app, dbManager) {
 				res.redirect("/login");
 			} else {
 				req.session.user = users[0].email;
-				app.get("logger").info("The user" + req.session.user + " has logged in");
+				app.get("logger").info("The user " + req.session.user + " has logged in");
 				res.redirect("/users");
 			}
 		});
