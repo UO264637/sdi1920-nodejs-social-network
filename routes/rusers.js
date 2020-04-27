@@ -83,7 +83,7 @@ module.exports = function(app, dbManager) {
 							user.sent = results[0].length > 0;
 							user.received = results[1].length > 0;
 							return user;
-						}).catch((err) => console.log(err));
+						}).catch((err) => console.error(err));
 					}
 				})).then((result) => {
 					// Prepares the pagination
@@ -98,7 +98,7 @@ module.exports = function(app, dbManager) {
 						alerts: alerts
 					});
 					res.send(answer);
-				}).catch((err) => console.log(err));
+				}).catch((err) => console.error(err));
 			});
 		});
 	});
