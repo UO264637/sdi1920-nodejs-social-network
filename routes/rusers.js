@@ -79,14 +79,14 @@ module.exports = function(app, dbManager) {
 						return user;
 					} else {
 						// Load the possible requests
-						let pSent = dbManager.get("requests", {from: current._id, to: user._id});
-						let pReceived = dbManager.get("requests", {from: user._id, to: current._id});
+						let gSent = dbManager.get("requests", {from: current._id, to: user._id});
+						let gReceived = dbManager.get("requests", {from: user._id, to: current._id});
 						// Check there's an already pending friend request
-						return Promise.all([pSent, pReceived]).then((results) => {
+						return Promise.all([gSent, gReceived]).then((results) => {
 							user.sent = results[0].length > 0;
 							user.received = results[1].length > 0;
 							return user;
-						}).catch((err) => console.error(err));
+						}).catch((err) => {throw err});
 					}
 				})).then((result) => {
 					// Prepares the pagination
@@ -101,7 +101,12 @@ module.exports = function(app, dbManager) {
 						alerts: alerts
 					});
 					res.send(answer);
-				}).catch((err) => console.error(err));
+				}).catch((err) => {
+					// Error management
+					console.error(err);
+					req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has occurred"}];
+					res.redirect("/users");
+				});
 			});
 		});
 	});
@@ -114,10 +119,10 @@ module.exports = function(app, dbManager) {
 	 *	Registers the user in the app
 	 */
 	app.post("/signup", function(req, res) {
-		checkValidRegister(req).then((errors) =>{
+		checkValidRegister(req).then((alerts) =>{
 			// In case of errors, redirects to the register page
-			if (errors.length > 0) {
-				req.session.alerts = errors;
+			if (alerts.length > 0) {
+				req.session.alerts = alerts;
 				// Stores some inputs to improve usability
 				req.session.inputs = {
 					name: req.body.name,
@@ -139,6 +144,7 @@ module.exports = function(app, dbManager) {
 			dbManager.insert("users", user, function(id) {
 				if (id == null) {
 					req.session.user = null;
+					req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has happened"}];
 					res.redirect("/signup");
 				} else {
 					req.session.user = user.email;
@@ -146,7 +152,12 @@ module.exports = function(app, dbManager) {
 					res.redirect("/users");
 				}
 			});
-		}).catch((err) => console.error(err));
+		}).catch((err) => {
+			// Error management
+			app.get("logger").error(err);
+			req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has occurred"}];
+			res.redirect("/signup");
+		});
 	});
 
 	/**
@@ -185,7 +196,7 @@ module.exports = function(app, dbManager) {
 	let checkValidRegister = async (req) => {
 		let errors = [];
 		// Email unique check, asynchronous
-		const result = dbManager.get("users", {email: req.body.email});
+		const gUser = dbManager.get("users", {email: req.body.email});
 		// Name check
 		if (!req.body.name || req.body.name.length < 3)
 			errors.push({type: "warning", msg: "The name can't be less than three characters long"});
@@ -200,12 +211,12 @@ module.exports = function(app, dbManager) {
 			errors.push({type: "warning", msg: "The passwords does not match"});
 		if (req.body.password.length < 3)
 			errors.push({type: "danger", msg: "This password is not secure enough"});
-		return await result.then((result) => {
+		return await gUser.then((result) => {
 			if (result.length > 0)
 				errors.push({type: "warning", msg: "The entered email is already in use"});
 			// Returns the errors collected
 			return errors;
-		}).catch((err) => console.error(err));
+		}).catch((err) => {throw err});
 	};
 
 };

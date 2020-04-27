@@ -74,7 +74,7 @@ module.exports = function(app, dbManager) {
                     } else {
                         res.status(201);
                         res.json({
-                            mensaje: "Inserted message",
+                            message: "Inserted message",
                             _id: id
                         })
                     }
