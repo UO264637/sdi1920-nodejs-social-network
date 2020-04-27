@@ -21,7 +21,7 @@ module.exports = {
 	connect: function (callback, operation) {
 		this.mongo.MongoClient.connect(this.app.get("db"), function (err, db) {
 			if (err) {
-				console.log("Unable to connect to the database");
+				console.error("Unable to connect to the database");
 				callback(null);
 			} else {
 				operation(db);
@@ -51,7 +51,7 @@ module.exports = {
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
 				return db.collection(collection).insert(input);
-			}).catch((err) => console.log(err));
+			}).catch((err) => console.error(err));
 		}
 	},
 
@@ -77,7 +77,7 @@ module.exports = {
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
 				return db.collection(collection).find(query).toArray();
-			}).catch((err) => console.log(err));
+			}).catch((err) => console.error(err));
 		}
 	},
 
@@ -124,7 +124,7 @@ module.exports = {
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
 				return db.collection(collection).update(query, {$set: input});
-			}).catch((err) => console.log(err));
+			}).catch((err) => console.error(err));
 		}
 	},
 
@@ -168,10 +168,10 @@ module.exports = {
 								from: this.mongo.ObjectID(results[0][0]._id),
 								to: this.mongo.ObjectID(results[1][0]._id)
 							};
-						}).catch((err) => console.log(err));
+						}).catch((err) => console.error(err));
 						// Insertion of the requests
 					})).then((requests) => this.insert("requests", requests))
-						.catch((err) => console.log(err));
+						.catch((err) => console.error(err));
 					db.close();
 				});
 				// Load all the users
@@ -184,9 +184,8 @@ module.exports = {
 						})})).then((friends) => {
 							// Updates the users
 							user.friends = friends;
-							console.log(user);
 							this.update("users", { email: user.email }, user);
-						}).catch((err) => console.log(err));
+						}).catch((err) => console.error(err));
 					})
 				});
 			});

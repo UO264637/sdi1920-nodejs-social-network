@@ -4,6 +4,9 @@ module.exports = function(app, dbManager) {
  										GET
 	\*****************************************************************************/
 
+	/**
+	 * Sends as friend request to the specified user
+	 */
 	app.get("/friend/add/:id", (req, res) => {
 		// Check the users are candidates to send the request
 		checkValidUsers(req.session.user, req.params.id).then(results => {
@@ -36,19 +39,29 @@ module.exports = function(app, dbManager) {
 		}).catch((err) => console.error(err));
 	});
 
+	/**
+	 * List the incoming friend requests of the user
+	 */
 	app.get("/friend/requests", (req, res) => {
 		// Load the user
 		dbManager.get("users", {email: req.session.user}, (result) => {
 			if (result == null)
-				console.log("Unable to retrieve the current user");
+				console.error("Unable to retrieve the current user");
 			else {
 				// Loads the incoming requests
 				dbManager.get("requests", {to: result[0]._id}, (result) => {
 					// Loads the senders of those requests
-					dbManager.get("users", {_id: {$in: result.map((request) => request.from)}}, (result) => {
-						// Sends the page with the list
+					let pg = req.query.pg ? parseInt(req.query.pg) : 1;
+					let query = {_id: {$in: result.map((request) => request.from)}};
+					dbManager.getPg("users", query, pg, (result, count) => {
+						// Prepares the pagination
+						let pages = [];
+						for (let i = pg-2; i<=pg+2; i++) pages.push(i);
+						// Sends the page
 						res.send(app.generateView("views/friend/requests.html", req.session, {
-							friends: result
+							friends: result,
+							pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
+							current: pg,
 						}));
 					});
 				});
@@ -114,7 +127,7 @@ module.exports = function(app, dbManager) {
 			return (results.length > 0) ?
 				[{type: "warning", msg: "There's already a pending friend request with this user"}]
 				: [];
-		}).catch((err) => console.log(err));
+		}).catch((err) => console.error(err));
 	}
 
 };

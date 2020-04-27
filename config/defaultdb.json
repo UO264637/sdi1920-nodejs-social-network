@@ -42,7 +42,8 @@
         "kaladin@bridge4.com",
         "shallan@davar.com",
         "jasnah@kholin.com",
-        "navani@kholin.com"
+        "navani@kholin.com",
+        "elhokar@kholin.com"
       ]
     },
     {
@@ -56,7 +57,6 @@
         "renarin@kholin.com",
         "kaladin@bridge4.com",
         "shallan@davar.com",
-        "jasnah@kholin.com",
         "navani@kholin.com"
       ]
     },
@@ -71,7 +71,6 @@
         "dalinar@kholin.com",
         "kaladin@bridge4.com",
         "shallan@davar.com",
-        "jasnah@kholin.com",
         "navani@kholin.com"
       ]
     },
@@ -111,10 +110,8 @@
       "password": "123",
       "role": "USER",
       "friends": [
-        "adolin@kholin.com",
-        "renarin@kholin.com",
         "dalinar@kholin.com",
-        "navani@kholin.com"
+        "shallan@davar.com"
       ]
     },
     {
@@ -127,8 +124,18 @@
         "adolin@kholin.com",
         "renarin@kholin.com",
         "dalinar@kholin.com",
-        "jasnah@kholin.com",
         "kaladin@bridge4.com"
+      ]
+    },
+    {
+      "name": "Elhokar",
+      "surname": "Kholin",
+      "email": "elhokar@kholin.com",
+      "password": "123",
+      "role": "USER",
+      "friends": [
+        "dalinar@kholin.com",
+        "hoid@sagaz.com"
       ]
     },
     {
@@ -158,17 +165,7 @@
       "password": "123",
       "role": "USER",
       "friends": [
-
-      ]
-    },
-    {
-      "name": "Kame",
-      "surname": "Patata",
-      "email": "cocotero@amarillo",
-      "password": "123",
-      "role": "ADMIN",
-      "friends": [
-
+        "elhokar@kholin.com"
       ]
     }
   ],
@@ -204,6 +201,26 @@
     {
       "from": "shallan@davar.com",
       "to": "navani@kholin.com"
+    },
+    {
+      "from": "elhokar@kholin.com",
+      "to": "jasnah@kholin.com"
+    },
+    {
+      "from": "renarin@kholin.com",
+      "to": "jasnah@kholin.com"
+    },
+    {
+      "from": "adolin@kholin.com",
+      "to": "jasnah@kholin.com"
+    },
+    {
+      "from": "navani@kholin.com",
+      "to": "jasnah@kholin.com"
+    },
+    {
+      "from": "torol@sadeas.com",
+      "to": "jasnah@kholin.com"
     }
   ]
 }
