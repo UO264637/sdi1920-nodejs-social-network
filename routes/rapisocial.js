@@ -5,17 +5,17 @@ module.exports = function(app, dbManager) {
      \*****************************************************************************/
 
     app.get("/api/friends/", function (req, res) {
-        var criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
+        var query = { "email" : res.user};
 
-        gestorBD.obtenerCanciones(criterio,function(canciones){
-            if ( canciones == null ){
+        dbManager.get("users", query,function(users){
+            if ( users == null ){
                 res.status(500);
                 res.json({
                     error : "se ha producido un error"
                 })
             } else {
                 res.status(200);
-                res.send( JSON.stringify(canciones[0]) );
+                res.send( JSON.stringify(users[0].friends));
             }
         });
     });
@@ -25,8 +25,6 @@ module.exports = function(app, dbManager) {
      \*****************************************************************************/
 
     app.post("/api/login/", function (req, res) {
-        console.log(req.body.email);
-        console.log(req.body.password  );
         let password = app.encrypt(req.body.password);
         let query = {
             email : req.body.email,
