@@ -1,14 +1,32 @@
 module.exports = function(app, dbManager) {
 
-    app.get("/api/users/", function (req, res) {
-                res.status(200);
+    /*****************************************************************************\
+                                            GET
+     \*****************************************************************************/
+
+    app.get("/api/friends/", function (req, res) {
+        var criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
+
+        gestorBD.obtenerCanciones(criterio,function(canciones){
+            if ( canciones == null ){
+                res.status(500);
                 res.json({
-                    patatas: true,
-                    tomate: true
-                });
+                    error : "se ha producido un error"
+                })
+            } else {
+                res.status(200);
+                res.send( JSON.stringify(canciones[0]) );
+            }
+        });
     });
 
+    /*****************************************************************************\
+                                            POST
+     \*****************************************************************************/
+
     app.post("/api/login/", function (req, res) {
+        console.log(req.body.email);
+        console.log(req.body.password  );
         let password = app.encrypt(req.body.password);
         let query = {
             email : req.body.email,

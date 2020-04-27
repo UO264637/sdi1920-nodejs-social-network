@@ -118,10 +118,20 @@ userTokenRouter.use(hasToken, tokenChecker);
 
 app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
-app.use('/api/users', userTokenRouter);		// Sets the api access
+app.use('/api/friends', userTokenRouter);		// Sets the api access
 app.use("/users", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use("/friend/*", authRouter);
 app.use(express.static("public"));				// Sets the static folder
+
+// Headers
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Credentials", "true");
+	res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
+	// Debemos especificar todas las headers que se aceptan. Content-Type , token
+	next();
+});
 
 
 /*****************************************************************************\
