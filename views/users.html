@@ -1,4 +1,4 @@
-{% extends "..\base.html" %}
+{% extends "base.html" %}
 {% block title %} Users {% endblock %}
 {% block main %}
 <h2>Users</h2>
@@ -48,11 +48,11 @@
                             <span class="glyphicon glyphicon-ok"></span> Requested
                         </a>
                         {% elseif u.received %}
-                        <a type="button" class="btn btn-success" href="/friend/requests">
+                        <a type="button" class="btn btn-success" href="/requests">
                             <span class="glyphicon glyphicon-exclamation-sign"></span> Requested
                         </a>
                         {% elseif !u.isFriend %}
-                        <a type="button" class="btn btn-primary addButton" href="/friend/add/{{u.email}}">
+                        <a type="button" class="btn btn-primary addButton" href="/requests/send/{{u.email}}">
                             <span class="glyphicon glyphicon-plus"></span> Add Friend
                         </a>
                         {% else %}

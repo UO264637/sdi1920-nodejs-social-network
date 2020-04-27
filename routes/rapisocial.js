@@ -11,7 +11,7 @@ module.exports = function(app, dbManager) {
             if ( users == null ){
                 res.status(500);
                 res.json({
-                    error : "se ha producido un error"
+                    error : "An error has ocurred"
                 })
             } else {
                 res.status(200);
@@ -44,6 +44,40 @@ module.exports = function(app, dbManager) {
                 res.json({
                     authenticated: true,
                     token: token
+                });
+            }
+        });
+    });
+
+    app.post("/api/message/", function (req, res) {
+        let message = {
+            from : "",
+            to : dbManager.mongo.ObjectID(req.body.to),
+            text: req.body.text,
+            read: false,
+            date: new Date()
+        };
+        dbManager.get("users", {email: res.user}, function(users) {
+            if (users == null || users.length === 0) {
+                res.status(500); // Unauthorized
+                res.json({
+                    error: "An error has ocurred"
+                })
+            } else {
+                message.from = users[0]._id;
+                dbManager.insert("messages", message, function (id) {
+                    if (id == null) {
+                        res.status(500);
+                        res.json({
+                            error: "An error has ocurred"
+                        })
+                    } else {
+                        res.status(201);
+                        res.json({
+                            message: "Inserted message",
+                            _id: id
+                        })
+                    }
                 });
             }
         });
