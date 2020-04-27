@@ -202,6 +202,8 @@ module.exports = {
 				});
 				// Load all the users
 				this.get("users", {}, (users) => {
+					if (users == null)
+						throw "Error loading the collection of users when updating the friends";
 					users.forEach((user) => {
 						// Change the email for their ids
 						Promise.all(user.friends.map(async (friendId) => {

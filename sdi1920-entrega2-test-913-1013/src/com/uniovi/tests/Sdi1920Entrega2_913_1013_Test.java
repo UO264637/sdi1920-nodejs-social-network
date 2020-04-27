@@ -1,10 +1,11 @@
 package com.uniovi.tests;
-//Paquetes Java
-import java.util.List;
 //Paquetes JUnit 
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 //Paquetes Selenium 
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.*;
@@ -16,18 +17,19 @@ import com.uniovi.tests.pageobjects.*;
 
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING) 
-public class NotaneitorTests {
-	//En Windows (Debe ser la versión 65.0.1 y desactivar las actualizacioens automáticas)):
-	//static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	//static String Geckdriver024 = "C:\\Path\\geckodriver024win64.exe";
-	//En MACOSX (Debe ser la versión 65.0.1 y desactivar las actualizacioens automáticas):
-	static String PathFirefox65 = "/Applications/Firefox 2.app/Contents/MacOS/firefox-bin";
-	//static String PathFirefox64 = "/Applications/Firefox.app/Contents/MacOS/firefox-bin";
-	static String Geckdriver024 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver024mac";
-	//static String Geckdriver022 = "/Users/delacal/Documents/SDI1718/firefox/geckodriver023mac";
-	//Común a Windows y a MACOSX
+public class Sdi1920Entrega2_913_1013_Test {
+	
+	// CARMEN
+//	static String PathFirefox65 = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+//	static String Geckdriver024 = "D:\\UNI\\Tercero\\SDI\\Sesion 5\\Material\\geckodriver024win64.exe";
+
+	// RICHI
+	static String PathFirefox65 = "D:\\Mozilla Firefox\\firefox.exe";
+	static String Geckdriver024 = "E:\\Clase\\SDI\\Material\\PL-SDI-Sesi�n5-material\\geckodriver024win64.exe";
+	
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024); 
-	static String URL = "https://localhost:8081";
+	static String URL = "http://localhost:8081";
+	static String RESET = "http://localhost:8081/reset";
 
 
 	public static WebDriver getDriver(String PathFirefox, String Geckdriver) {
@@ -40,47 +42,107 @@ public class NotaneitorTests {
 
 	@Before
 	public void setUp(){
+		// And the navigate to the web
 		driver.navigate().to(URL);
 	}
+	
 	@After
 	public void tearDown(){
 		driver.manage().deleteAllCookies();
 	}
+	
 	@BeforeClass 
 	static public void begin() {
-		//COnfiguramos las pruebas.
-		//Fijamos el timeout en cada opción de carga de una vista. 2 segundos.
-		PO_View.setTimeout(3);
+		// Before the tests we reset the database
+		driver.navigate().to(RESET);
+		PO_View.setTimeout(10);
 
 	}
+	
 	@AfterClass
 	static public void end() {
 		//Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 	}
 
-	//PR01. Sin hacer /
+	/********************************************************************************\
+	  										SIGN UP TESTS
+	\********************************************************************************/
+
+	/**
+	 * PR01 - User registry with valid data
+	 */
 	@Test
 	public void PR01() {
-		assertTrue("PR01 sin hacer", false);			
+		PO_HomeView.goToRegister(driver);
+		PO_RegisterView.fillForm(driver, "Lopen", "Bridge 4", "lopen@bridge4.com", "12345678", "12345678");
+		PO_View.checkElement(driver, "id", "tableUsers");
 	}
 
-	//PR02. Sin hacer /
+	/**
+	 * PR02 - User registry with invalid data, empty email, name and surname
+	 * 
+	 * The required of those inputs, won't let us advance to the next page, so we check we still are on Register
+	 */
 	@Test
 	public void PR02() {
-		assertTrue("PR02 sin hacer", false);			
-	}
-
-	//PR03. Sin hacer /
-	@Test
-	public void PR03() {
-		assertTrue("PR03 sin hacer", false);			
+		PO_HomeView.goToRegister(driver);
+		// Empty email
+		PO_RegisterView.fillForm(driver, "Lopen", "Bridge 4", "", "12345678", "12345678");
+		PO_RegisterView.checkElement(driver, "id", "iName");
+		// Empty name
+		PO_RegisterView.fillForm(driver, "", "Bridge 4", "lopen@bridge4.com", "12345678", "12345678");
+		PO_RegisterView.checkElement(driver, "id", "iName");
+		// Empty surname
+		PO_RegisterView.fillForm(driver, "", "Bridge 4", "lopen@bridge4.com", "12345678", "12345678");
+		PO_RegisterView.checkElement(driver, "id", "iName");
 	}
 	
-	//PR04. Sin hacer /
+	/**
+	 * PR02_1 - User registry with invalid data, too short name and surname
+	 */
+	@Test
+	public void PR02_1() {
+		PO_HomeView.goToRegister(driver);
+		// Too short name
+		PO_RegisterView.fillForm(driver, "a", "Bridge 4", "lopen@bridge4.com", "12345678", "12345678");
+		PO_RegisterView.checkElement(driver, "class", "alert");
+		// Too short surname
+		PO_RegisterView.fillForm(driver, "Lopen", "a", "lopen@bridge4.com", "12345678", "12345678");
+		PO_RegisterView.checkElement(driver, "class", "alert");		
+	}
+	
+	/**
+	 * PR02_2 - User registry with invalid data, too insecure password
+	 */
+	@Test
+	public void PR02_2() {
+		PO_HomeView.goToRegister(driver);
+		// Too short name
+		PO_RegisterView.fillForm(driver, "Lopen", "Bridge 4", "lopen@bridge4.com", "12", "12");
+		PO_RegisterView.checkElement(driver, "class", "alert");		
+	}
+
+	/**
+	 * PR03 - User registry with invalid data, passwords doesn't match
+	 */
+	@Test
+	public void PR03() {
+		PO_HomeView.goToRegister(driver);
+		// Too short name
+		PO_RegisterView.fillForm(driver, "Lopen", "Bridge 4", "lopen@bridge4.com", "12345678", "abcdefgh");
+		PO_RegisterView.checkElement(driver, "class", "alert");			
+	}
+	
+	/**
+	 * PR04 - User registry with invalid data, email already used
+	 */
 	@Test
 	public void PR04() {
-		assertTrue("PR04 sin hacer", false);			
+		PO_HomeView.goToRegister(driver);
+		// Too short name
+		PO_RegisterView.fillForm(driver, "Dalinar", "Kholin", "dalinar@kholin.com", "12345678", "12345678");
+		PO_RegisterView.checkElement(driver, "class", "alert");		
 	}
 	
 	//PR05. Sin hacer /
