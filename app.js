@@ -119,6 +119,7 @@ userTokenRouter.use(hasToken, tokenChecker);
 app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
 app.use('/api/friends', userTokenRouter);		// Sets the api access
+app.use('/api/message', userTokenRouter);		// Sets the api access
 app.use("/users", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use("/friend/*", authRouter);
 app.use(express.static("public"));				// Sets the static folder
