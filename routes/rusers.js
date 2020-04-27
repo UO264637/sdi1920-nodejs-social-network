@@ -22,8 +22,11 @@ module.exports = function(app, dbManager) {
 	 * Loads the login page
 	 */
 	app.get("/login", function(req, res) {
-		const {alerts} = app.cleanSession(req);
-		res.send(app.generateView("views/login.html", req.session, {alerts: alerts}));
+		const {alerts, inputs} = app.cleanSession(req);
+		res.send(app.generateView("views/login.html", req.session, {
+			alerts: alerts,
+			inputs: inputs
+		}));
 	});
 
 	/**
@@ -157,6 +160,9 @@ module.exports = function(app, dbManager) {
 		dbManager.get("users", query, function(users) {
 			if (users == null || users.length === 0) {
 				req.session.alerts = [{type: "warning", msg: "Incorrect email or password"}];
+				req.session.inputs = {
+					email: req.body.email
+				};
 				req.session.user = null;
 				res.redirect("/login");
 			} else {
