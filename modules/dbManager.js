@@ -129,6 +129,32 @@ module.exports = {
 	},
 
 	/*****************************************************************************\
+	 									DELETE
+	\*****************************************************************************/
+
+	/**
+	 * Deletes the queried into the specified collection
+	 * @param collection					Collection to look
+	 * @param query							Query of the object(s) to update
+	 * @param callback						Callback function (optional)
+	 * @returns {Promise<Promise | void>}	returns Promise if no callback passed
+	 */
+	delete: async function (collection, query, callback) {
+		if (callback) {				// Specifying a callback calls the operation with it
+			this.connect(callback, function(db) {
+				db.collection(collection).remove(query, function(err, result) {
+					(err) ? callback(null) : callback(result.ops[0]._id);
+					db.close();
+				})
+			});}
+		else { 						// Without callback the function returns a promise
+			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
+				return db.collection(collection).remove(query);
+			}).catch((err) => console.error(err));
+		}
+	},
+
+	/*****************************************************************************\
 	 								DATABASE RESET
 	\*****************************************************************************/
 
