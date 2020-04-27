@@ -1,4 +1,4 @@
-{% extends "..\base.html" %}
+{% extends "base.html" %}
 {% block title %} Friends {% endblock %}
 {% block main %}
 <h2>Users</h2>
@@ -36,7 +36,7 @@
         <ul class="pagination">
             {% for page in pages %}
             <li class="page-item" id="pi-{{page}}">
-                <a class="page-link" href="/friend/list?pg={{page}}">
+                <a class="page-link" href="/friends?pg={{page}}">
                     {{page}}
                 </a>
             </li>

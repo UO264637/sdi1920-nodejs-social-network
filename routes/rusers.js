@@ -93,7 +93,7 @@ module.exports = function(app, dbManager) {
 					let pages = [];
 					for (let i = pg-2; i<=pg+2; i++) pages.push(i);
 					// Sends the page
-					let answer = app.generateView("views/user/list.html", req.session,{
+					let answer = app.generateView("views/users.html", req.session,{
 						userList: result,
 						pages: pages.filter((i) => {return (i > 0 && i <= Math.ceil(count/5))}),
 						current: pg,
