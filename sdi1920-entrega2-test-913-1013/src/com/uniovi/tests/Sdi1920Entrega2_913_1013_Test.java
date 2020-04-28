@@ -505,7 +505,15 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR19() {
-		assertTrue("PR19 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "kaladin@bridge4.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		// We go to the friend page	
+		PO_UsersView.goToFriends(driver);	
+		// And we check the expected users
+		PO_RequestsView.checkUsers(driver, "Dalinar", "Adolin", "Renarin", "Shallan", "Navani");
+		PO_RequestsView.changePage(driver, 2);
+		PO_RequestsView.checkUsers(driver, "Roca"); // Con Numuhukumakiaki'aialunamor no funciona :P
 	}	
 	
 	/**
@@ -513,7 +521,12 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR19_1() {
-		assertTrue("PR19_1 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "torol@sadeas.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		PO_UsersView.goToFriends(driver);	
+		// And we check the expected users
+		PO_RequestsView.checkUsers(driver);	
 	}
 	
 	/********************************************************************************\
@@ -525,7 +538,10 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR20() {
-		assertTrue("PR20 sin hacer", false);			
+		// We navigate to the users URL
+		driver.navigate().to(URL + "/users");	
+		// We check we get redirected to the login
+		PO_LoginView.checkElement(driver, "id", "email");		
 	}	
 	
 	/**
@@ -533,7 +549,10 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR21() {
-		assertTrue("PR21 sin hacer", false);			
+		// We navigate to the requests URL
+		driver.navigate().to(URL + "/requests");	
+		// We check we get redirected to the login
+		PO_LoginView.checkElement(driver, "id", "email");		
 	}	
 	
 	/**
@@ -546,31 +565,38 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR22() {
-		assertTrue("PR22 sin hacer", false);			
+		// We navigate to the friends URL
+		driver.navigate().to(URL + "/friends");	
+		// We check we get redirected to the login
+		PO_LoginView.checkElement(driver, "id", "email");				
 	}	
-	
-	/**
-	 * PR22_1. Try to access the list of friends as anonymous, check you can't
-	 */
-	@Test
-	public void PR22_1() {
-		assertTrue("PR22_1 sin hacer", false);			
-	}
 	
 	/**
 	 * PR22_2. Try to access the login form as logged user, check you can't
 	 */
 	@Test
-	public void PR22_2() {
-		assertTrue("PR22_2 sin hacer", false);			
+	public void PR22_1() {
+		PO_LoginView.checkElement(driver, "id", "email");
+		// We log in
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");
+		// We navigate to the login URL
+		driver.navigate().to(URL + "/login");	
+		// We check we get redirected to the users
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
 	}
 	
 	/**
-	 * PR22_3. Try to access the register form as logged user, check you can't
+	 * PR22_2. Try to access the register form as logged user, check you can't
 	 */
 	@Test
-	public void PR22_3() {
-		assertTrue("PR22_3 sin hacer", false);			
+	public void PR22_2() {
+		PO_LoginView.checkElement(driver, "id", "email");
+		// We log in
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");
+		// We navigate to the login URL
+		driver.navigate().to(URL + "/signup");	
+		// We check we get redirected to the users
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
 	}
 	
 
