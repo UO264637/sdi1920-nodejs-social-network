@@ -51,4 +51,14 @@ public class PO_View {
 		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, type, text, getTimeout());
 		return elementos;		
 	}
+	
+	/**
+	 * Checks the text is no present in the page
+	 * @param driver
+	 * @param text		Text to check
+	 */
+	static public void checkNoText(WebDriver driver, String text) {
+		SeleniumUtils.EsperaCargaPaginaNoTexto(driver, text, getTimeout());
+	}
+	
 }

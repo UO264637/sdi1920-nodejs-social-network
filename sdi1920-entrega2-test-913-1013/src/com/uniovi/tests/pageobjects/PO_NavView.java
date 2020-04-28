@@ -19,15 +19,15 @@ public class PO_NavView  extends PO_View{
 	 * @param textoDestino: texto correspondiente a la búsqueda de la página destino.
 	 */
 	public static void clickOption(WebDriver driver, String textOption, String criterio, String textoDestino) {
-		//CLickamos en la opción de registro y esperamos a que se cargue el enlace de Registro.
+		//CLickamos en la opci�n de registro y esperamos a que se cargue el enlace de Registro.
 		List<WebElement> elementos = SeleniumUtils.EsperaCargaPagina(driver, "@href", textOption, getTimeout());
-		//Tiene que haber un sólo elemento.
+		//Tiene que haber un solo elemento.
 		assertTrue(elementos.size()==1);
 		//Ahora lo clickamos
 		elementos.get(0).click();
 		//Esperamos a que sea visible un elemento concreto
 		elementos = SeleniumUtils.EsperaCargaPagina(driver, criterio, textoDestino, getTimeout());
-		//Tiene que haber un sólo elemento.
+		//Tiene que haber un solo elemento.
 		assertTrue(elementos.size()==1);	
 	}
 	
@@ -44,6 +44,40 @@ public class PO_NavView  extends PO_View{
 		elements.get(0).click();
 		// And we wait for the register form to show up
 		elements = SeleniumUtils.EsperaCargaPagina(driver, "id", "iName", getTimeout());
+		// There should be only one element, the name input field
+		assertTrue(elements.size()==1);	
+	}
+	
+	/**
+	 * Navigates to the Requests page (only visible when logged in)
+	 * @param driver
+	 */
+	static public void goToRequests(WebDriver driver) {
+		// We load the element leading to the requests
+		List<WebElement> elements = SeleniumUtils.EsperaCargaPagina(driver, "@href", "requests", getTimeout());
+		// There should be one element
+		assertTrue(elements.size()==1);
+		// We click it
+		elements.get(0).click();
+		// And we wait for the requests table to show up
+		elements = SeleniumUtils.EsperaCargaPagina(driver, "id", "tableRequests", getTimeout());
+		// There should be only one element, the name input field
+		assertTrue(elements.size()==1);	
+	}
+	
+	/**
+	 * Closes the session and redirects to the Login page (only visible when logged in)
+	 * @param driver
+	 */
+	static public void logOut(WebDriver driver) {
+		// We load the element leading to the logout
+		List<WebElement> elements = SeleniumUtils.EsperaCargaPagina(driver, "@href", "logout", getTimeout());
+		// There should be one element
+		assertTrue(elements.size()==1);
+		// We click it
+		elements.get(0).click();
+		// And we wait for the login form to show up
+		elements = SeleniumUtils.EsperaCargaPagina(driver, "id", "email", getTimeout());
 		// There should be only one element, the name input field
 		assertTrue(elements.size()==1);	
 	}

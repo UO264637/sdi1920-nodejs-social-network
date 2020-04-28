@@ -116,13 +116,13 @@ public class Sdi1920Entrega2_913_1013_Test {
 		PO_LoginView.goToRegister(driver);
 		// We fill the form with invalid data (too short name)
 		PO_RegisterView.fillForm(driver, "a", "Bridge 4", "teft@bridge4.com", "12345678", "12345678");
-		// And we check we still are in the register page and got an alert
+		// And we check we still are in the register page and got a warning alert
 		PO_RegisterView.checkElement(driver, "id", "iName");
-		PO_RegisterView.checkElement(driver, "class", "alert");
+		PO_RegisterView.checkElement(driver, "class", "alert-warning");
 		// Same with too short surname
 		PO_RegisterView.fillForm(driver, "Teft", "a", "teft@bridge4.com", "12345678", "12345678");
 		PO_RegisterView.checkElement(driver, "id", "iName");
-		PO_RegisterView.checkElement(driver, "class", "alert");		
+		PO_RegisterView.checkElement(driver, "class", "alert-warning");		
 	}
 	
 	/**
@@ -135,7 +135,7 @@ public class Sdi1920Entrega2_913_1013_Test {
 		// Same as previous test with too short password
 		PO_RegisterView.fillForm(driver, "Teft", "Bridge 4", "teft@bridge4.com", "12", "12");
 		PO_RegisterView.checkElement(driver, "id", "iName");
-		PO_RegisterView.checkElement(driver, "class", "alert");		
+		PO_RegisterView.checkElement(driver, "class", "alert-danger");		
 	}
 
 	/**
@@ -148,7 +148,8 @@ public class Sdi1920Entrega2_913_1013_Test {
 		// Same as previous test with not matching passwords
 		PO_RegisterView.fillForm(driver, "Teft", "Bridge 4", "teft@bridge4.com", "12345678", "abcdefgh");
 		PO_RegisterView.checkElement(driver, "id", "iName");
-		PO_RegisterView.checkElement(driver, "class", "alert");			
+		// In this case the page prints a danger alert
+		PO_RegisterView.checkElement(driver, "class", "alert-warning");			
 	}
 	
 	/**
@@ -161,7 +162,7 @@ public class Sdi1920Entrega2_913_1013_Test {
 		// Same as previous test with already used email
 		PO_RegisterView.fillForm(driver, "Dalinar", "Kholin", "dalinar@kholin.com", "12345678", "12345678");
 		PO_RegisterView.checkElement(driver, "id", "iName");
-		PO_RegisterView.checkElement(driver, "class", "alert");		
+		PO_RegisterView.checkElement(driver, "class", "alert-warning");		
 	}
 	
 	/********************************************************************************\
@@ -306,15 +307,36 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR15() {
-		assertTrue("PR15 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "roca@bridge4.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		// We send a friend request to a valid user
+		PO_UsersView.sendFrienRequest(driver, "shallan@davar.com");
+		// We check we got a success alert
+		PO_UsersView.checkElement(driver, "class", "alert-success");
+		// We log in as Shallan
+		PO_UsersView.logOut(driver);
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "shallan@davar.com", "123");
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		// We navigate to the friend requests page
+		PO_UsersView.goToRequests(driver);
+		// We check we got the Roca request
+		PO_RequestsView.checkElement(driver, "text", "Roca");
 	}	
 	
 	/**
-	 * PR16. Try to send a request to an already requested user and assert to you can't.
+	 * PR16. Try to send a request to an already requested user and assert that you can't.
 	 */
 	@Test
 	public void PR16() {
-		assertTrue("PR16 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "hoid@sagaz.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		// We try send a friend request to an already requested user
+		PO_UsersView.sendFrienRequest(driver, "dalinar@kholin.com");
+		// We check we didn't get the success alert
+		PO_UsersView.checkNoText(driver, "successfully");
 	}	
 	
 	/**
@@ -322,23 +344,28 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR16_1() {
-		assertTrue("PR16_1 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		// We try send a friend request to a friend
+		PO_UsersView.sendFrienRequest(driver, "adolin@kholin.com");
+		// We check we didn't get the success alert
+		PO_UsersView.checkNoText(driver, "successfully");	
 	}
 	
 	/**
-	 *  PR16_1. Try to send a friend request to yourself (through URL) and assert you can't
+	 *  PR16_2. Try to send a friend request to someone that requested you, check it redirects you to the requests page
 	 */
 	@Test
 	public void PR16_2() {
-		assertTrue("PR16_2 sin hacer", false);			
-	}
-	
-	/**
-	 *  PR16_3. Try to send a friend request to someone that requested you, check it redirects you to the requests page
-	 */
-	@Test
-	public void PR16_3() {
-		assertTrue("PR16_3 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		PO_UsersView.changePage(driver, 2);
+		// We try send a friend request to a user that already requested us
+		PO_UsersView.sendFrienRequest(driver, "hoid@sagaz.com");
+		// We check we didn't get the success alert
+		PO_RequestsView.checkElement(driver, "id", "tableRequests");
 	}
 	
 	/********************************************************************************\
