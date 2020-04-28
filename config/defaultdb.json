@@ -222,5 +222,117 @@
       "from": "torol@sadeas.com",
       "to": "jasnah@kholin.com"
     }
+  ],
+  "messages": [
+    {
+      "from": "dalinar@kholin.com",
+      "to": "elhokar@kholin.com",
+      "text": "Make me High Prince of War.",
+      "read": true,
+      "date": ""
+    },
+    {
+      "from": "elhokar@kholin.com",
+      "to": "dalinar@kholin.com",
+      "text": "No, I can't.",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "elhokar@kholin.com",
+      "text": "Make me High Prince of War.",
+      "read": true,
+      "date": ""
+    },{
+      "from": "elhokar@kholin.com",
+      "to": "dalinar@kholin.com",
+      "text": "No, I can't.",
+      "read": true,
+      "date": ""
+    },{
+      "from": "elhokar@kholin.com",
+      "to": "dalinar@kholin.com",
+      "text": "I made Sadeas High Prince of Information",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "elhokar@kholin.com",
+      "text": "Make me High Prince of War",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "elhokar@kholin.com",
+      "text": "I'll kill you",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "elhokar@kholin.com",
+      "text": "Thereby, me, Elhokar Kholin, king of Alethkar, name you, Dalinar Kholin, High Prince of War",
+      "read": true,
+      "date": ""
+    },{
+      "from": "kaladin@bridge4.com",
+      "to": "dalinar@kholin.com",
+      "text": "Amaram bad",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "kaladin@bridge4.com",
+      "text": "Amaram good",
+      "read": true,
+      "date": ""
+    },{
+      "from": "kaladin@bridge4.com",
+      "to": "dalinar@kholin.com",
+      "text": "Amaram bad",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "kaladin@bridge4.com",
+      "text": "Amaram good",
+      "read": false,
+      "date": ""
+    },{
+      "from": "kaladin@bridge4.com",
+      "to": "dalinar@kholin.com",
+      "text": "Amaram bad",
+      "read": true,
+      "date": ""
+    },{
+      "from": "navani@kholin.com",
+      "to": "dalinar@kholin.com",
+      "text": ";)",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "navani@kholin.com",
+      "text": "?",
+      "read": true,
+      "date": ""
+    },{
+      "from": "navani@kholin.com",
+      "to": "dalinar@kholin.com",
+      "text": "(¬‿¬) <3",
+      "read": true,
+      "date": ""
+    },{
+      "from": "dalinar@kholin.com",
+      "to": "navani@kholin.com",
+      "text": "???",
+      "read": true,
+      "date": ""
+    },{
+      "from": "navani@kholin.com",
+      "to": "dalinar@kholin.com",
+      "text": "(╯°□°)╯︵ ┻━┻",
+      "read": false,
+      "date": ""
+    }
   ]
 }
