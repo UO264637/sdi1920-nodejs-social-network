@@ -141,14 +141,14 @@ module.exports = function(app, dbManager) {
 				friends: []
 			};
 			// User insertion
-			dbManager.insert("users", user, function(id) {
-				if (id == null) {
+			dbManager.insert("users", user, function(result) {
+				if (result[0]._id == null) {
 					req.session.user = null;
 					req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has happened"}];
 					res.redirect("/signup");
 				} else {
-					req.session.user = user.email;
-					app.get("logger").info("The user " + user.email + " has registered and logged in");
+					req.session.user = result[0].email;
+					app.get("logger").info("The user " + result[0].email + " has registered and logged in");
 					res.redirect("/users");
 				}
 			});

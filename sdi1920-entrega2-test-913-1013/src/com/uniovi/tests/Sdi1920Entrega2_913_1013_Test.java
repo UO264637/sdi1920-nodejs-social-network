@@ -233,10 +233,14 @@ public class Sdi1920Entrega2_913_1013_Test {
 		// We log in and check we are in the Users page
 		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
 		PO_UsersView.checkElement(driver, "id", "tableUsers");
-		// We check the number of users in the first page (there should be five)
+		// We check the number of users in the first page (there should be this five)
 		PO_UsersView.checkUsers(driver, "Adolin", "Renarin", "Kaladin", "Shallan", "Jasnah");
-		// We navigate to the second page
+		// We navigate to the second page and check its users
 		PO_UsersView.changePage(driver, 2);
+		PO_UsersView.checkUsers(driver, "Navani", "Elhokar", "Sadeas", "Roca", "Hoid");
+		// We navigate to the third page and check there's the test registered user
+		PO_UsersView.changePage(driver, 3);
+		PO_UsersView.checkUsers(driver, "Lopen");
 	}	
 	
 	/********************************************************************************\

@@ -97,16 +97,20 @@ module.exports = function(app, dbManager) {
 					to: dbManager.mongo.ObjectId(userToAdd._id)
 				};
 				// Insertion of the request and notification to the user
-				dbManager.insert("requests", request, () => {
-					req.session.alerts = [{type: "success", msg: "The friend request was successfully sent"}];
-					res.redirect("/users");
+				dbManager.insert("requests", request, (results) => {
+					if (results == null)
+						throw "Error inserting the request";
+					else {
+						req.session.alerts = [{type: "success", msg: "The friend request was successfully sent"}];
+						res.redirect("/users");
+					}
 				});
 			}).catch((err) => {throw err});
 		}).catch((err) => {
 			// Error management
 			app.get("logger").error(err);
 			req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has occurred"}];
-			res.redirect("/requests");
+			res.redirect("/users");
 		});
 	});
 

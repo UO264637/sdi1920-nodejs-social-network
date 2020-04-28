@@ -44,7 +44,7 @@ module.exports = {
 		if (callback) {				// Specifying a callback calls the operation with it
 			this.connect(callback, function(db) {
 				db.collection(collection).insert(input, function(err, result) {
-					(err) ? callback(null) : callback(result.ops[0]._id);
+					(err) ? callback(null) : callback(result.ops);
 					db.close();
 				})
 			});}
@@ -176,46 +176,52 @@ module.exports = {
 	reset: function(defaultb) {
 		// Loads the data from the config files
 		let {users, requests} = defaultb;
-
+		let logger = this.app.get("logger");
 		// Deletion of users, when done inserts them again and their related data
 		this.clear("users", (db) => {
 			// Encryption of the password
 			users.forEach((user) => user.password = this.app.encrypt(user.password));
 			// Insertion of the users
-			this.insert("users", users).then(() => {
-				// Deletion of requests
-				this.clear("requests", (db) => {
-					// Loads the user ids into each request
-					Promise.all(requests.map(async (request) => {
-						let pFrom = this.get("users", {email: request.from});
-						let pTo = this.get("users", {email: request.to});
-						return Promise.all([pFrom, pTo]).then((results) => {
+			this.insert("users", users, (users) => {
+				if (users == null)
+					logger.error("An error has occurred inserting the users");
+				else {
+					users.forEach((u) => logger.info("Inserted user: " + u.email + " (" + u._id) + ")");
+					// Deletion of requests, when done inserts them again with ids instead of emails
+					this.clear("requests", (db) => {
+						// Change of the requests to hold the ids of the users
+						requests = requests.map((request) => {
 							return {
-								from: this.mongo.ObjectID(results[0][0]._id),
-								to: this.mongo.ObjectID(results[1][0]._id)
-							};
-						}).catch((err) => console.error(err));
+								from: users.filter((u) => u.email === request.from).pop()._id,
+								to: users.filter((u) => u.email === request.to).pop()._id
+						}});
 						// Insertion of the requests
-					})).then((requests) => this.insert("requests", requests))
-						.catch((err) => console.error(err));
-					db.close();
-				});
-				// Load all the users
-				this.get("users", {}, (users) => {
-					if (users == null)
-						throw "Error loading the collection of users when updating the friends";
+						this.insert("requests", requests, (results) => {
+							if (results == null)
+								logger.error("An error has occurred inserting the users");
+							else {
+								results.forEach((r) =>
+									logger.info("Inserted request: {from:" + r.from + ", to: " + r.to + "} ("
+										+ r._id + ")"));
+							}
+						});
+						db.close();
+					});
+					// Update of the users to hold the ids in the list of friends instead of the emails
 					users.forEach((user) => {
 						// Change the email for their ids
-						Promise.all(user.friends.map(async (friendId) => {
-							return this.get("users", {email: friendId}).then((result) => {
-								return result[0]._id;
-						})})).then((friends) => {
-							// Updates the users
-							user.friends = friends;
-							this.update("users", { email: user.email }, user);
-						}).catch((err) => console.error(err));
+						user.friends = user.friends.map((friend) => {
+							return users.filter((u) => u.email === friend).pop()._id
+						});
+						// Updates the users
+						this.update("users", { email: user.email }, user, (result) => {
+							if (result == null)
+								logger.error("An error has occurred updating the users");
+							else
+								logger.info("Updated the user " + user.email + " (" + user._id + ")");
+						});
 					})
-				});
+				}
 			});
 			db.close();
 		});
