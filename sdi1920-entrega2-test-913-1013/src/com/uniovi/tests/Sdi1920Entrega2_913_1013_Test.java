@@ -115,12 +115,12 @@ public class Sdi1920Entrega2_913_1013_Test {
 		PO_LoginView.checkElement(driver, "id", "email");
 		PO_LoginView.goToRegister(driver);
 		// We fill the form with invalid data (too short name)
-		PO_RegisterView.fillForm(driver, "a", "Bridge 4", "lopen@bridge4.com", "12345678", "12345678");
+		PO_RegisterView.fillForm(driver, "a", "Bridge 4", "teft@bridge4.com", "12345678", "12345678");
 		// And we check we still are in the register page and got an alert
 		PO_RegisterView.checkElement(driver, "id", "iName");
 		PO_RegisterView.checkElement(driver, "class", "alert");
 		// Same with too short surname
-		PO_RegisterView.fillForm(driver, "Lopen", "a", "lopen@bridge4.com", "12345678", "12345678");
+		PO_RegisterView.fillForm(driver, "Teft", "a", "teft@bridge4.com", "12345678", "12345678");
 		PO_RegisterView.checkElement(driver, "id", "iName");
 		PO_RegisterView.checkElement(driver, "class", "alert");		
 	}
@@ -133,7 +133,7 @@ public class Sdi1920Entrega2_913_1013_Test {
 		PO_LoginView.checkElement(driver, "id", "email");
 		PO_LoginView.goToRegister(driver);
 		// Same as previous test with too short password
-		PO_RegisterView.fillForm(driver, "Lopen", "Bridge 4", "lopen@bridge4.com", "12", "12");
+		PO_RegisterView.fillForm(driver, "Teft", "Bridge 4", "teft@bridge4.com", "12", "12");
 		PO_RegisterView.checkElement(driver, "id", "iName");
 		PO_RegisterView.checkElement(driver, "class", "alert");		
 	}
@@ -146,7 +146,7 @@ public class Sdi1920Entrega2_913_1013_Test {
 		PO_LoginView.checkElement(driver, "id", "email");
 		PO_LoginView.goToRegister(driver);
 		// Same as previous test with not matching passwords
-		PO_RegisterView.fillForm(driver, "Lopen", "Bridge 4", "lopen@bridge4.com", "12345678", "abcdefgh");
+		PO_RegisterView.fillForm(driver, "Teft", "Bridge 4", "teft@bridge4.com", "12345678", "abcdefgh");
 		PO_RegisterView.checkElement(driver, "id", "iName");
 		PO_RegisterView.checkElement(driver, "class", "alert");			
 	}
@@ -252,15 +252,31 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR12() {
-		assertTrue("PR12 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		// We insert our empty search
+		PO_UsersView.search(driver, "");
+		// There should be the same users than the previous test
+		PO_UsersView.checkUsers(driver, "Adolin", "Renarin", "Kaladin", "Shallan", "Jasnah");
+		PO_UsersView.changePage(driver, 2);
+		PO_UsersView.checkUsers(driver, "Navani", "Elhokar", "Sadeas", "Roca", "Hoid");
+		PO_UsersView.changePage(driver, 3);
+		PO_UsersView.checkUsers(driver, "Lopen");
 	}	
 	
 	/**
-	 * PR13. Make a search with a non existant text and assert it shows an empty list.
+	 * PR13. Make a search with a non existent text and assert it shows an empty list.
 	 */
 	@Test
 	public void PR13() {
-		assertTrue("PR13 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		// We insert our search
+		PO_UsersView.search(driver, "Moash");
+		// There should be the no users
+		PO_UsersView.checkUsers(driver);		
 	}	
 	
 	/**
@@ -268,7 +284,15 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR14() {
-		assertTrue("PR14 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		// We insert our search
+		PO_UsersView.search(driver, "ho");
+		// And we check the expected users
+		PO_UsersView.checkUsers(driver, "Adolin", "Renarin", "Jasnah", "Navani", "Elhokar");
+		PO_UsersView.changePage(driver, 2);
+		PO_UsersView.checkUsers(driver, "Hoid");		
 	}	
 	
 	
