@@ -12,10 +12,7 @@ module.exports = function(app, dbManager) {
 		// Load the user
 		dbManager.get("users", {email: req.session.user}, (result) => {
 			if (result == null) {
-				// Error management
-				app.get("logger").error("Unable to retrieve the current user");
-				req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has occurred"}];
-				res.redirect("/users");
+				throw "Unable to retrieve the current user";
 			} else {
 				// Loads the incoming requests
 				dbManager.get("requests", {to: result[0]._id}, (result) => {
@@ -46,10 +43,7 @@ module.exports = function(app, dbManager) {
 		// Load the user
 		dbManager.get("users", {email: req.session.user}, (result) => {
 			if (result == null) {
-				// Error management
-				app.get("logger").error("Unable to retrieve the current user");
-				req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has occurred"}];
-				res.redirect("/users");
+				throw "Unable to retrieve the current user";
 			} else {
 				// Loads the friends
 				let query = {_id: {$in: result[0].friends}};
