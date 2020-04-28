@@ -314,9 +314,8 @@ public class Sdi1920Entrega2_913_1013_Test {
 		PO_UsersView.sendFrienRequest(driver, "shallan@davar.com");
 		// We check we got a success alert
 		PO_UsersView.checkElement(driver, "class", "alert-success");
-		// We log in as Shallan
+		// We log in as the requested friend
 		PO_UsersView.logOut(driver);
-		PO_LoginView.checkElement(driver, "id", "email");
 		PO_LoginView.fillForm(driver, "shallan@davar.com", "123");
 		PO_UsersView.checkElement(driver, "id", "tableUsers");	
 		// We navigate to the friend requests page
@@ -364,9 +363,43 @@ public class Sdi1920Entrega2_913_1013_Test {
 		PO_UsersView.changePage(driver, 2);
 		// We try send a friend request to a user that already requested us
 		PO_UsersView.sendFrienRequest(driver, "hoid@sagaz.com");
-		// We check we didn't get the success alert
+		// We check we get redirected to the Requests page
 		PO_RequestsView.checkElement(driver, "id", "tableRequests");
 	}
+	
+	/**
+	 *  PR16_3. Try to send an invalid request with the URL to: 
+	 *  	Yourself, an admin, a friend, a inexistent user, to someone that already requested you using the URL
+	 *  Check it redirects you to the users page with an alert
+	 */
+	@Test
+	public void PR16_3() {
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "jasnah@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		// We navigate to the URL to send a request to ourselves
+		driver.navigate().to(URL + "/requests/send/jasnah@kholin.com");
+		// We check we got redirected to the Users page with an alert
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		PO_UsersView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to send a request to an admin
+		driver.navigate().to(URL + "/requests/send/admin@email.com");
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		PO_UsersView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to send a request to a friend
+		driver.navigate().to(URL + "/requests/send/dalinar@kholin.com");
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		PO_UsersView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to send a request to a inexistent user
+		driver.navigate().to(URL + "/requests/send/taravangian@karbranth.com");
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		PO_UsersView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to send a request to a requester
+		driver.navigate().to(URL + "/requests/send/adolin@kholin.com");
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		PO_UsersView.checkElement(driver, "class", "alert-warning");
+	}
+	
 	
 	/********************************************************************************\
 										W7 - REQUESTS LIST
@@ -377,7 +410,15 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR17() {
-		assertTrue("PR17 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "jasnah@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		// We go to the requests page
+		PO_UsersView.goToRequests(driver);
+		// And we check the expected users
+		PO_RequestsView.checkUsers(driver, "Adolin", "Renarin", "Navani", "Elhokar", "Torol");
+		PO_RequestsView.changePage(driver, 2);
+		PO_RequestsView.checkUsers(driver, "Hoid");
 	}	
 	
 	/**
@@ -385,7 +426,12 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR17_1() {
-		assertTrue("PR17_1 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "torol@sadeas.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		PO_UsersView.goToRequests(driver);
+		// And we check the expected users
+		PO_RequestsView.checkUsers(driver);		
 	}
 	
 	/********************************************************************************\
@@ -393,19 +439,61 @@ public class Sdi1920Entrega2_913_1013_Test {
 	\********************************************************************************/
 	
 	/**
-	 * PR18. Accept a request amd check the friendship is established.
+	 * PR18. Accept a request and check the friendship is established.
 	 */
 	@Test
 	public void PR18() {
-		assertTrue("PR18 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		PO_UsersView.goToRequests(driver);
+		PO_RequestsView.acceptFrienRequest(driver, "Hoid");
+		// We check we got a success alert
+		PO_UsersView.checkElement(driver, "class", "alert-success");
+		// We navigate to the friend requests page
+		PO_UsersView.goToFriends(driver);
+		// We check the accepted user is now on friends
+		PO_TableView.changePage(driver, 2);
+		PO_TableView.checkElement(driver, "text", "Hoid");
+		// We log in as the accepted user
+		PO_UsersView.logOut(driver);
+		PO_LoginView.fillForm(driver, "hoid@sagaz.com", "123");
+		PO_UsersView.checkElement(driver, "id", "tableUsers");	
+		PO_UsersView.goToFriends(driver);
+		// And check the original user appears in the friend list
+		PO_TableView.checkElement(driver, "text", "Dalinar");
 	}	
 	
 	/**
-	 * PR18_1. Try to accept a non-existant friend request (through URL) and assert you can't.
+	 * PR18_1. Try to accept a inexistent friend request (through URL) and assert you can't.
+	 * 	Of yourself, an admin, a friend, an inexistent user and a user that didn't request you
 	 */
 	@Test
 	public void PR18_1() {
-		assertTrue("PR18_1 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		PO_UsersView.checkElement(driver, "id", "tableUsers");
+		// We navigate to the URL to accept the invalid friendship of ourselves
+		driver.navigate().to(URL + "/friends/accept/dalinar@kholin.com");
+		// We check we got redirected to the Requests page with an alert
+		PO_RequestsView.checkElement(driver, "id", "tableRequests");
+		PO_RequestsView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to accept the invalid friendship of an admin
+		driver.navigate().to(URL + "/friends/accept/admin@email.com");
+		PO_RequestsView.checkElement(driver, "id", "tableRequests");
+		PO_RequestsView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to accept the invalid friendship of a friend
+		driver.navigate().to(URL + "/friends/accept/adolin@kholin.com");
+		PO_RequestsView.checkElement(driver, "id", "tableRequests");
+		PO_RequestsView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to accept the invalid friendship of an inexistent user
+		driver.navigate().to(URL + "/friends/accept/gavilar@kholin.com");
+		PO_RequestsView.checkElement(driver, "id", "tableRequests");
+		PO_RequestsView.checkElement(driver, "class", "alert-warning");
+		// We navigate to the URL to accept the invalid friendship of a user that didn't request you
+		driver.navigate().to(URL + "/friends/accept/roca@bridge4.com");
+		PO_RequestsView.checkElement(driver, "id", "tableRequests");
+		PO_RequestsView.checkElement(driver, "class", "alert-warning");
 	}
 	
 	/********************************************************************************\

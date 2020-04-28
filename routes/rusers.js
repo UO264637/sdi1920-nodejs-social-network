@@ -68,8 +68,12 @@ module.exports = function(app, dbManager) {
 		// Query consult to get the page users
 		let pg = req.query.pg ? parseInt(req.query.pg) : 1;
 		dbManager.getPg("users", query, pg, (result, count) => {
+			if (result == null)
+				throw "Error retrieving the list of users";
 			// Load the current user to know their friendships
 			dbManager.get("users", {email: req.session.user}, (current) => {
+				if (current == null)
+					throw "Error retrieving the current user";
 				current = current[0];
 				// Check the relationship of the user with the current
 				Promise.all(result.map(async (user) => {
@@ -103,7 +107,7 @@ module.exports = function(app, dbManager) {
 					res.send(answer);
 				}).catch((err) => {
 					// Error management
-					console.error(err);
+					app.get("logger").error(err);
 					req.session.alerts = [{type: "danger", msg: "Sorry, an unexpected error has occurred"}];
 					res.redirect("/users");
 				});

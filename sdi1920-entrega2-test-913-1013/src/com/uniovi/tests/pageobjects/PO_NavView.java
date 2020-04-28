@@ -38,8 +38,6 @@ public class PO_NavView  extends PO_View{
 	static public void goToRegister(WebDriver driver) {
 		// We load the elements leading to the register
 		List<WebElement> elements = SeleniumUtils.EsperaCargaPagina(driver, "@href", "signup", getTimeout());
-		// There should be two elements
-		assertTrue(elements.size()==2);
 		// We click it
 		elements.get(0).click();
 		// And we wait for the register form to show up
@@ -55,12 +53,25 @@ public class PO_NavView  extends PO_View{
 	static public void goToRequests(WebDriver driver) {
 		// We load the element leading to the requests
 		List<WebElement> elements = SeleniumUtils.EsperaCargaPagina(driver, "@href", "requests", getTimeout());
-		// There should be one element
-		assertTrue(elements.size()==1);
 		// We click it
 		elements.get(0).click();
 		// And we wait for the requests table to show up
 		elements = SeleniumUtils.EsperaCargaPagina(driver, "id", "tableRequests", getTimeout());
+		// There should be only one element, the name input field
+		assertTrue(elements.size()==1);	
+	}
+	
+	/**
+	 * Navigates to the Requests page (only visible when logged in)
+	 * @param driver
+	 */
+	static public void goToFriends(WebDriver driver) {
+		// We load the element leading to the requests
+		List<WebElement> elements = SeleniumUtils.EsperaCargaPagina(driver, "@href", "friends", getTimeout());
+		// We click it
+		elements.get(0).click();
+		// And we wait for the requests table to show up
+		elements = SeleniumUtils.EsperaCargaPagina(driver, "id", "tableFriends", getTimeout());
 		// There should be only one element, the name input field
 		assertTrue(elements.size()==1);	
 	}
