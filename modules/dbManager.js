@@ -175,7 +175,7 @@ module.exports = {
 	 */
 	reset: function(defaultb) {
 		// Loads the data from the config files
-		let {users, requests} = defaultb;
+		let {users, requests, messages} = defaultb;
 		let logger = this.app.get("logger");
 		// Deletion of users, when done inserts them again and their related data
 		this.clear("users", (db) => {
@@ -198,7 +198,7 @@ module.exports = {
 						// Insertion of the requests
 						this.insert("requests", requests, (results) => {
 							if (results == null)
-								logger.error("An error has occurred inserting the users");
+								logger.error("An error has occurred inserting the requests");
 							else {
 								results.forEach((r) =>
 									logger.info("Inserted request: {from:" + r.from + ", to: " + r.to + "} ("
@@ -220,7 +220,27 @@ module.exports = {
 							else
 								logger.info("Updated the user " + user.email + " (" + user._id + ")");
 						});
-					})
+					});
+					// Deletion of messages, when done inserts them again with ids instead of emails
+					this.clear("messages", (db) => {
+						// Change of the requests to hold the ids of the users
+						messages.forEach((request) => {
+							request.from = users.filter((u) => u.email === request.from).pop()._id;
+							request.to = users.filter((u) => u.email === request.to).pop()._id;
+							request.date = Date.now();
+						});
+						// Insertion of the requests
+						this.insert("messages", messages, (results) => {
+							if (results == null)
+								logger.error("An error has occurred inserting the messages");
+							else {
+								results.forEach((r) =>
+									logger.info("Inserted message: {from:" + r.from + ", to: " + r.to + "} ("
+										+ r._id + ")"));
+							}
+						});
+						db.close();
+					});
 				}
 			});
 			db.close();
