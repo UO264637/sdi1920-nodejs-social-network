@@ -120,6 +120,7 @@ app.use("/login", anonRouter);				// Sets the access to the login (only anonymou
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
 app.use('/api/friends', userTokenRouter);	// Sets the api access
 app.use('/api/message', userTokenRouter);
+app.use('/api/chat*', userTokenRouter);
 app.use("/users*", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use("/requests*", authRouter);
 app.use("/friends*", authRouter);

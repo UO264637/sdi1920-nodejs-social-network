@@ -20,6 +20,35 @@ module.exports = function(app, dbManager) {
         });
     });
 
+    app.get("/api/chat/:id", function (req, res) {
+        dbManager.get("users", { "email" : res.user},function(users){
+            if ( users == null ){
+                res.status(500);
+                res.json({
+                    error : "An error has ocurred"
+                })
+            } else {
+                var query = { $or:[
+                        {"to" : dbManager.mongo.ObjectID(req.params.id),
+                         "from" : dbManager.mongo.ObjectID(users[0]._id)},
+                        {"to" : dbManager.mongo.ObjectID(users[0]._id),
+                         "from" : dbManager.mongo.ObjectID(req.params.id)}
+                    ]};
+                dbManager.get("messages", query,function(messages){
+                    if ( messages == null ){
+                        res.status(500);
+                        res.json({
+                            error : "An error has ocurred"
+                        })
+                    } else {
+                        res.status(200);
+                        res.send( JSON.stringify(messages));
+                    }
+                });
+            }
+        });
+    });
+
     /*****************************************************************************\
                                             POST
      \*****************************************************************************/
