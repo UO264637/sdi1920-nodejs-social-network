@@ -111,4 +111,51 @@ module.exports = function(app, dbManager) {
             }
         });
     });
+
+    /*****************************************************************************\
+                                            PUT
+     \*****************************************************************************/
+
+    app.put("/api/read/:id", function(req, res) {
+        dbManager.get("users", {email: res.user}, function(users) {
+            if (users == null) {
+                res.status(500);
+                res.json({
+                    error: "An error has ocurred"
+                })
+            } else {
+                let query = {
+                    "_id": dbManager.mongo.ObjectID(req.params.id),
+                    "to": dbManager.mongo.ObjectID(users[0]._id)
+                };
+
+                let message = {};
+                message.read = true;
+
+                dbManager.update("messages", query, message, function (result) {
+                    if (result == null) {
+                        res.status(500);
+                        res.json({
+                            error: "An error has ocurred"
+                        })
+                    } else {
+                        if (result.result.nModified == 0) {
+                            res.status(403);
+                            res.json({
+                                mensaje: "Message not modified",
+                                _id: req.params.id
+                            })
+                        }
+                        else {
+                            res.status(200);
+                            res.json({
+                                mensaje: "Message modified",
+                                _id: req.params.id
+                            })
+                        }
+                    }
+                });
+            }
+        });
+    });
 };
