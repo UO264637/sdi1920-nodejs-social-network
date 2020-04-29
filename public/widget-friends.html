@@ -1,14 +1,11 @@
 <div id="widget-friends" >
-    <input type="text" class="form-control" placeholder="Filtrar por nombre"
-           id="filtro-nombre"/>
-    <button class="btn btn-primary" onclick="widgetAgregar()">Nueva Canción</button>
-    <button class="btn" onclick="cargarCanciones()" >Actualizar</button>
+    <button class="btn" onclick="loadFriends()" >Update</button>
     <table class="table table-hover">
         <thead>
         <tr>
-            <th><a onclick="ordenarPorNombre()">Nombre</a></th>
-            <th><a onclick="ordenarPorGenero()">Genero</a></th>
-            <th><a onclick="ordenarPorPrecio()">Precio</a></th>
+            <th><a>Name</a></th>
+            <th><a>Surname</a></th>
+            <th><a>Email</a></th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
@@ -17,3 +14,54 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    window.history.pushState("", "", "/cliente.html?w=friends");
+
+    var friends;
+    function loadFriends(){
+        $.ajax({
+            url: URLbase + "/friends",
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(response) {
+                console.log(response)
+                friends = response;
+                updateTable(friends);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+    function updateTable(friendsList){
+        $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
+        for (i = 0; i < friendsList.length; i++) {
+            $.ajax({
+                url: URLbase + "/user/" + friendsList[i],
+                type: "GET",
+                data: { },
+                dataType: 'json',
+                headers: { "token": token },
+                success: function(response) {
+                    $( "#tablaCuerpo" ).append(
+                        "<tr id="+response._id+">"+
+                        "<td>"+response.name+"</td>" +
+                        "<td>"+response.surname+"</td>" +
+                        "<td>"+response.email+"</td>" +
+                        "<td>"+
+                        "<a onclick=message('"+response._id+"')>Message</a><br>"+
+                        "</td>"+
+                        "</tr>" );
+                },
+                error : function (error){
+                    $( "#contenedor-principal" ).load("widget-login.html");
+                }
+            });
+        }
+    }
+
+    loadFriends();
+</script>

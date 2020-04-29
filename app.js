@@ -122,6 +122,7 @@ app.use("/api/friends", userTokenRouter);	// Sets the api access
 app.use("/api/message", userTokenRouter);
 app.use("/api/chat*", userTokenRouter);
 app.use("/api/read*", userTokenRouter);
+app.use("/api/user*", userTokenRouter);
 app.use("/users*", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use("/requests*", authRouter);
 app.use("/friends*", authRouter);

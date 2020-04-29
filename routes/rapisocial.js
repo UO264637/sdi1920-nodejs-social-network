@@ -20,6 +20,22 @@ module.exports = function(app, dbManager) {
         });
     });
 
+    app.get("/api/user/:id", function (req, res) {
+        var query = { "_id" : dbManager.mongo.ObjectID(req.params.id)};
+
+        dbManager.get("users", query,function(users){
+            if ( users == null ){
+                res.status(500);
+                res.json({
+                    error : "An error has ocurred"
+                })
+            } else {
+                res.status(200);
+                res.send( JSON.stringify(users[0]));
+            }
+        });
+    });
+
     app.get("/api/chat/:id", function (req, res) {
         dbManager.get("users", { "email" : res.user},function(users){
             if ( users == null ){
