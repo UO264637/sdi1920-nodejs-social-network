@@ -84,7 +84,7 @@ module.exports = function(app, dbManager) {
             to : dbManager.mongo.ObjectID(req.body.to),
             text: req.body.text,
             read: false,
-            date: new Date()
+            date: Date.now()
         };
         dbManager.get("users", {email: res.user}, function(users) {
             if (users == null || users.length === 0) {
@@ -94,20 +94,27 @@ module.exports = function(app, dbManager) {
                 })
             } else {
                 message.from = users[0]._id;
-                dbManager.insert("messages", message, function (id) {
-                    if (id == null) {
-                        res.status(500);
-                        res.json({
-                            error: "An error has ocurred"
-                        })
-                    } else {
-                        res.status(201);
-                        res.json({
-                            message: "Inserted message",
-                            _id: id
-                        })
-                    }
-                });
+                if (users[0].friends.map((friend) => friend.toString()).includes(req.body.to.toString())) {
+                    dbManager.insert("messages", message, function (id) {
+                        if (id == null) {
+                            res.status(500);
+                            res.json({
+                                error: "An error has ocurred"
+                            })
+                        } else {
+                            res.status(201);
+                            res.json({
+                                message: "Inserted message",
+                                _id: id
+                            })
+                        }
+                    });
+                } else {
+                    res.status(403);
+                    res.json({
+                        message: "You must be friends",
+                    })
+                }
             }
         });
     });
