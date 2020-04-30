@@ -1,4 +1,6 @@
 <div id="widget-friends" >
+    <input type="text" class="form-control" placeholder="Filter by name"
+           id="name-filter"/>
     <button class="btn" onclick="loadFriends()" >Update</button>
     <table class="table table-hover">
         <thead>
@@ -9,7 +11,7 @@
             <th class="col-md-1"></th>
         </tr>
         </thead>
-        <tbody id="tablaCuerpo">
+        <tbody id="bodyTable">
 
         </tbody>
     </table>
@@ -18,7 +20,7 @@
 <script>
     window.history.pushState("", "", "/cliente.html?w=friends");
 
-    var friends;
+    var friends = [];
     function loadFriends(){
         $.ajax({
             url: URLbase + "/friends",
@@ -27,8 +29,30 @@
             dataType: 'json',
             headers: { "token": token },
             success: function(response) {
-                console.log(response)
-                friends = response;
+                for (i = 0; i < response.length; i++) {
+                    $.ajax({
+                        url: URLbase + "/user/" + response[i],
+                        type: "GET",
+                        data: {},
+                        dataType: 'json',
+                        headers: {"token": token},
+                        success: function (response2) {
+                            friends.push(response2);
+                            $("#bodyTable").append(
+                                "<tr id=" + response2._id + ">" +
+                                "<td>" + response2.name + "</td>" +
+                                "<td>" + response2.surname + "</td>" +
+                                "<td>" + response2.email + "</td>" +
+                                "<td>" +
+                                "<a onclick=message('" + response2._id + "')>Message</a><br>" +
+                                "</td>" +
+                                "</tr>");
+                        },
+                        error: function (error) {
+                            $("#contenedor-principal").load("widget-login.html");
+                        }
+                    });
+                }
                 updateTable(friends);
             },
             error : function (error){
@@ -37,31 +61,31 @@
         });
     }
     function updateTable(friendsList){
-        $( "#tablaCuerpo" ).empty(); // Vaciar la tabla
+        $( "#bodyTable" ).empty(); // Vaciar la tabla
         for (i = 0; i < friendsList.length; i++) {
-            $.ajax({
-                url: URLbase + "/user/" + friendsList[i],
-                type: "GET",
-                data: { },
-                dataType: 'json',
-                headers: { "token": token },
-                success: function(response) {
-                    $( "#tablaCuerpo" ).append(
-                        "<tr id="+response._id+">"+
-                        "<td>"+response.name+"</td>" +
-                        "<td>"+response.surname+"</td>" +
-                        "<td>"+response.email+"</td>" +
+                    $( "#bodyTable" ).append(
+                        "<tr id="+friendsList[i]._id+">"+
+                        "<td>"+friendsList[i].name+"</td>" +
+                        "<td>"+friendsList[i].surname+"</td>" +
+                        "<td>"+friendsList[i].email+"</td>" +
                         "<td>"+
-                        "<a onclick=message('"+response._id+"')>Message</a><br>"+
+                        "<a onclick=message('"+friendsList[i]._id+"')>Message</a><br>"+
                         "</td>"+
                         "</tr>" );
-                },
-                error : function (error){
-                    $( "#contenedor-principal" ).load("widget-login.html");
-                }
-            });
         }
     }
+
+    $('#name-filter').on('input',function(e){
+        var filteredFriends = [];
+        var filterName = $("#name-filter").val();
+
+        for (i = 0; i < friends.length; i++) {
+            if (friends[i].name.indexOf(filterName) != -1 ){
+                filteredFriends.push(friends[i]);
+            }
+        }
+        updateTable(filteredFriends);
+    });
 
     loadFriends();
 </script>
