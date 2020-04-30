@@ -5,10 +5,9 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th><a>Name</a></th>
-            <th><a>Surname</a></th>
-            <th><a>Email</a></th>
-            <th class="col-md-1"></th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Email</th>
         </tr>
         </thead>
         <tbody id="bodyTable">
@@ -38,22 +37,13 @@
                         headers: {"token": token},
                         success: function (response2) {
                             friends.push(response2);
-                            $("#bodyTable").append(
-                                "<tr id=" + response2._id + ">" +
-                                "<td>" + response2.name + "</td>" +
-                                "<td>" + response2.surname + "</td>" +
-                                "<td>" + response2.email + "</td>" +
-                                "<td>" +
-                                "<a onclick=message('" + response2._id + "')>Message</a><br>" +
-                                "</td>" +
-                                "</tr>");
+                            updateTable(friends);
                         },
                         error: function (error) {
                             $("#contenedor-principal").load("widget-login.html");
                         }
                     });
                 }
-                updateTable(friends);
             },
             error : function (error){
                 $( "#contenedor-principal" ).load("widget-login.html");
@@ -65,12 +55,9 @@
         for (i = 0; i < friendsList.length; i++) {
                     $( "#bodyTable" ).append(
                         "<tr id="+friendsList[i]._id+">"+
-                        "<td>"+friendsList[i].name+"</td>" +
+                        "<td><a onclick=chat('"+friendsList[i]._id+"',\"" + friendsList[i].name +"\")>"+friendsList[i].name+"</a></td>" +
                         "<td>"+friendsList[i].surname+"</td>" +
                         "<td>"+friendsList[i].email+"</td>" +
-                        "<td>"+
-                        "<a onclick=message('"+friendsList[i]._id+"')>Message</a><br>"+
-                        "</td>"+
                         "</tr>" );
         }
     }
@@ -86,6 +73,12 @@
         }
         updateTable(filteredFriends);
     });
+
+    function chat(_id, name) {
+        idSelectedChat = _id;
+        idSelectedChatUser = name;
+        $( "#contenedor-principal" ).load( "widget-chat.html");
+    }
 
     loadFriends();
 </script>

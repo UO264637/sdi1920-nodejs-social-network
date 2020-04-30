@@ -43,7 +43,7 @@ module.exports = function(app, dbManager) {
                 res.json({
                     error : "An error has ocurred"
                 })
-            } else {
+             } else {
                 var query = { $or:[
                         {"to" : dbManager.mongo.ObjectID(req.params.id),
                          "from" : dbManager.mongo.ObjectID(users[0]._id)},

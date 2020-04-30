@@ -1,0 +1,65 @@
+<div id="widget-detalles">
+    <table class="table table-hover">
+        <thead>
+        <tr id="user-name">
+
+        </tr>
+        </thead>
+        <tbody id="bodyChat">
+
+        </tbody>
+    </table>
+    <button onclick="widgetFriends()" class="btn" >Back</button>
+</div>
+
+<script>
+    window.history.pushState("", "", "/cliente.html?w=chat");
+    $( "#user-name" ).append("<th>" + idSelectedChatUser + "</th><th> </th>");
+
+    var messages = [];
+    function loadMessages(){
+
+        $.ajax({
+            url: URLbase + "/chat/" + idSelectedChat,
+            type: "GET",
+            data: { },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function(response) {
+                messages = response
+                updateChat(messages);
+            },
+            error : function (error){
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        });
+    }
+
+    function updateChat(messagesList){
+
+
+        $( "#bodyChat" ).empty(); // Vaciar la tabla
+        for (i = 0; i < messagesList.length; i++) {
+            if (messagesList[i].from == (idSelectedChat)) {
+                $("#bodyChat").append(
+                    "<tr id=" + messagesList[i]._id + ">" +
+                    "<td>" + messagesList[i].text + "</td>" +
+                    "<td> </td>" +
+                    "</tr>");
+            }
+            else {
+                $("#bodyChat").append(
+                    "<tr id=" + messagesList[i]._id + ">" +
+                    "<td> </td>" +
+                    "<td>" + messagesList[i].text + "</td>" +
+                    "</tr>");
+            }
+        }
+        $("#bodyChat").append("<td><input type='text' class='form-control' name='message-text'" +
+        "placeholder='...' id='message-text'/></td>" +
+        "<td><button onclick=\'sendMessage()\' class=\"btn\" >Send</button></td>");
+    }
+
+    setInterval('loadMessages()',1000);
+
+</script>
