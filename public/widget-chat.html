@@ -73,6 +73,7 @@
 		numberOfMessages = messagesList.length;
 		$("#chat-history").empty(); // Vaciar la tabla
 		for (i = 0; i < messagesList.length; i++) {
+			var date = new Date(messagesList[i].date);
 			if (messagesList[i].from === (idSelectedUserId)) {
 				// If the id is the friend's id, it is and incoming message
 				$("#chat-history").append(
@@ -80,7 +81,8 @@
 					"<div class=\"received_msg\">\n" +
 					"<div class=\"received_withd_msg\">\n" +
 					"<p>" + messagesList[i].text + "</p>\n" +
-					"<span class=\"time_date\"> 11:01 AM    |    June 9</span></div>\n" +
+					"<span class=\"time_date\">" + date.toDateString() + " " +
+                    date.getHours() + ":" + date.getMinutes() + "</span></div>\n" +
 					"</div>\n" +
 					"</div>"
 				);
@@ -90,7 +92,8 @@
 					"<div class=\"outgoing_msg\" id=\"" + messagesList[i]._id + "\">\n" +
 					"<div class=\"sent_msg\">\n" +
 					"<p>" + messagesList[i].text + "</p>\n" +
-					"<span class=\"time_date\"> 11:01 AM    |    June 9</span> </div>\n" +
+					"<span class=\"time_date\">" + date.toDateString() + " " +
+					date.getHours() + ":" + date.getMinutes() + "</span></div>\n" +
 					"</div>");
 			}
 		}
