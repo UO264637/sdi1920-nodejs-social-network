@@ -82,7 +82,9 @@
 					"<div class=\"received_withd_msg\">\n" +
 					"<p>" + messagesList[i].text + "</p>\n" +
 					"<span class=\"time_date\">" + date.toDateString() + " " +
-                    date.getHours() + ":" + date.getMinutes() + "</span></div>\n" +
+                    date.getHours() + ":" + date.getMinutes() +
+                    (messagesList[i].read ? " <i class=\"fa fa-eye\"></i> Read" : "") +
+                    "</span></div>\n" +
 					"</div>\n" +
 					"</div>"
 				);
@@ -93,7 +95,9 @@
 					"<div class=\"sent_msg\">\n" +
 					"<p>" + messagesList[i].text + "</p>\n" +
 					"<span class=\"time_date\">" + date.toDateString() + " " +
-					date.getHours() + ":" + date.getMinutes() + "</span></div>\n" +
+					date.getHours() + ":" + date.getMinutes() +
+					(messagesList[i].read ? " <i class=\"fa fa-eye\"></i> Read" : "") +
+                    "</span></div>\n" +
 					"</div>");
 			}
 		}
