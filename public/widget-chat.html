@@ -9,18 +9,29 @@
 
         </tbody>
     </table>
+    <table class="table table-hover">
+        <thead>
+            <tr> </tr>
+            <tr> </tr>
+        </thead>
+        <tbody>
+            <td><input type='text' class='form-control' name='message-text' placeholder='...' id='message-text'/></td>
+            <td><button onclick='sendMessage()' class="btn" >Send</button></td>
+        </tbody>
+    </table>
     <button onclick="widgetFriends()" class="btn" >Back</button>
 </div>
 
 <script>
+    clearInterval();
     window.history.pushState("", "", "/cliente.html?w=chat");
-    $( "#user-name" ).append("<th>" + idSelectedChatUser + "</th><th> </th>");
+    $( "#user-name" ).append("<th>" + idSelectedUserName + "</th><th> </th>");
 
     var messages = [];
     function loadMessages(){
 
         $.ajax({
-            url: URLbase + "/chat/" + idSelectedChat,
+            url: URLbase + "/chat/" + idSelectedUserId,
             type: "GET",
             data: { },
             dataType: 'json',
@@ -40,7 +51,7 @@
 
         $( "#bodyChat" ).empty(); // Vaciar la tabla
         for (i = 0; i < messagesList.length; i++) {
-            if (messagesList[i].from == (idSelectedChat)) {
+            if (messagesList[i].from == (idSelectedUserId)) {
                 $("#bodyChat").append(
                     "<tr id=" + messagesList[i]._id + ">" +
                     "<td>" + messagesList[i].text + "</td>" +
@@ -55,11 +66,29 @@
                     "</tr>");
             }
         }
-        $("#bodyChat").append("<td><input type='text' class='form-control' name='message-text'" +
-        "placeholder='...' id='message-text'/></td>" +
-        "<td><button onclick=\'sendMessage()\' class=\"btn\" >Send</button></td>");
     }
 
+    function sendMessage(){
+
+        $.ajax({
+            url: URLbase + "/message",
+            type: "POST",
+            data: {
+                to : idSelectedUserId,
+                text : $("#message-text").val()
+            },
+            dataType: 'json',
+            headers: { "token": token },
+            success: function (respuesta) {
+                console.log("YAY");
+            },
+            error : function (error) {
+                $( "#contenedor-principal" ).load("widget-login.html");
+            }
+        })
+    }
+
+    clearInterval();
     setInterval('loadMessages()',1000);
 
 </script>
