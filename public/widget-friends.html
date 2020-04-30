@@ -1,25 +1,37 @@
-<div id="widget-friends" >
-    <input type="text" class="form-control" placeholder="Filter by name"
-           id="name-filter"/>
-    <button class="btn" onclick="loadFriends()" >Update</button>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Surname</th>
-            <th>Email</th>
-        </tr>
-        </thead>
-        <tbody id="bodyTable">
-
-        </tbody>
-    </table>
+<div class="messaging">
+    <div class="inbox_msg">
+        <div class="inbox_people" id="widget-friends">
+            <div class="headind_srch">
+                <div class="recent_heading">
+                    <h4>Friends</h4>
+                </div>
+                <div class="srch_bar">
+                    <div class="stylish-input-group">
+                        <input type="text" class="search-bar"  placeholder="Search"
+                               id="name-filter">
+                        <i class="fa fa-search"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="body_people" id="bodyFriends">
+                <!-- Lista de amigos -->
+            </div>
+        </div>
+        <div class="mesgs" id="chat-container"></div>
+    </div>
 </div>
 
 <script>
     window.history.pushState("", "", "/cliente.html?w=friends");
-
     var friends = [];
+
+	/**
+	 * Event listener to make the search when any key is entered
+	 */
+	$("#name-filter").keyup(function (e) {
+		filter();
+	});
+
     function loadFriends(){
         $.ajax({
             url: URLbase + "/friends",
@@ -50,35 +62,38 @@
             }
         });
     }
+
     function updateTable(friendsList){
-        $( "#bodyTable" ).empty(); // Vaciar la tabla
+        $( "#bodyFriends" ).empty(); // Vaciar la tabla
         for (i = 0; i < friendsList.length; i++) {
-                    $( "#bodyTable" ).append(
-                        "<tr id="+friendsList[i]._id+">"+
-                        "<td><a onclick=chat('"+friendsList[i]._id+"',\"" + friendsList[i].name +"\")>"+friendsList[i].name+"</a></td>" +
-                        "<td>"+friendsList[i].surname+"</td>" +
-                        "<td>"+friendsList[i].email+"</td>" +
-                        "</tr>" );
+                    $( "#bodyFriends" ).append(
+                    	"<a onclick=chat('"+friendsList[i]._id+"',\"" + friendsList[i].name +"\")>" +
+                    	"<div class=\"chat_list\" id=\"" + friendsList[i]._id + "\">\n" +
+						"<div class=\"chat_people\">\n" +
+						"<div class=\"chat_ib\">\n" +
+						"<h5>" + friendsList[i].name + " " + friendsList[i].surname + "</h5>\n" +
+                        "<p>" + friendsList[i].email + "</p>" +
+						"</div>\n</div>\n</div>\n</a>");
         }
     }
 
-    $('#name-filter').on('input',function(e){
-        var filteredFriends = [];
-        var filterName = $("#name-filter").val();
-
-        for (i = 0; i < friends.length; i++) {
-            if (friends[i].name.indexOf(filterName) != -1 ){
-                filteredFriends.push(friends[i]);
-            }
-        }
-        updateTable(filteredFriends);
-    });
+	/**
+     * Filters the list of friends based on the searched string
+	 */
+	function filter() {
+		var filterName = $("#name-filter").val().toLowerCase();
+		var filteredFriends = friends.filter((f) => f.name.toLowerCase().includes(filterName));
+		updateTable(filteredFriends);
+    }
 
     function chat(_id, name) {
         idSelectedUserId = _id;
         idSelectedUserName = name;
-        $( "#contenedor-principal" ).load( "widget-chat.html");
+        $( ".chat_list").removeClass("active_chat");
+        $( "#" + _id).addClass("active_chat");
+        $( "#chat-container" ).load( "widget-chat.html");
     }
 
     loadFriends();
+
 </script>

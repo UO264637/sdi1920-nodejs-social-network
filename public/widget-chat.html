@@ -1,94 +1,125 @@
-<div id="widget-detalles">
-    <table class="table table-hover">
-        <thead>
-        <tr id="user-name">
-
-        </tr>
-        </thead>
-        <tbody id="bodyChat">
-
-        </tbody>
-    </table>
-    <table class="table table-hover">
-        <thead>
-            <tr> </tr>
-            <tr> </tr>
-        </thead>
-        <tbody>
-            <td><input type='text' class='form-control' name='message-text' placeholder='...' id='message-text'/></td>
-            <td><button onclick='sendMessage()' class="btn" >Send</button></td>
-        </tbody>
-    </table>
-    <button onclick="widgetFriends()" class="btn" >Back</button>
+<div id="widget-chat">
+    <div class="heading_chat" id="chat-name">
+        <!-- Friend name -->
+    </div>
+    <div class="msg_history" id="chat-history">
+        <!-- Messages -->
+    </div>
+    <div class="type_msg">
+        <div class="input_msg_write">
+            <!-- Message textfield, sends the message pressing Enter -->
+            <input type="text" class="write_msg" placeholder="Type a message" id="message-text"/>
+            <button class="msg_send_btn" type="button" onclick="sendMessage()">
+                <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
-    clearInterval();
-    window.history.pushState("", "", "/cliente.html?w=chat");
-    $( "#user-name" ).append("<th>" + idSelectedUserName + "</th><th> </th>");
+	clearInterval();
+	window.history.pushState("", "", "/cliente.html?w=chat");
 
-    var messages = [];
-    function loadMessages(){
+	// Adds the name of the contact to the chat header
+	$("#chat-name").append("<h4>" + idSelectedUserName + "</h4>");
 
-        $.ajax({
-            url: URLbase + "/chat/" + idSelectedUserId,
-            type: "GET",
-            data: { },
-            dataType: 'json',
-            headers: { "token": token },
-            success: function(response) {
-                messages = response
-                updateChat(messages);
-            },
-            error : function (error){
-                $( "#contenedor-principal" ).load("widget-login.html");
-            }
-        });
-    }
+	var messages = [];
+	var numberOfMessages = -1;                      // This will control the chat updates
 
-    function updateChat(messagesList){
+	/**
+     * Event listener to send the message when pressing enter
+	 */
+	$("#message-text").keydown(function (e) {
+		if(e.key==="Enter") {
+			sendMessage();
+		}
+	});
 
+	/**
+     * When loaded a new chat history, we clean the chat and sets the spinner
+	 */
+	$("#chat-history").empty();
+	$("#chat-history").append(
+		"<div class=\"d-flex justify-content-center mt-1\">\n" +
+		"  <div class=\"spinner-border spinner-border-xs text-primary\" role=\"status\">\n" +
+		"    <span class=\"sr-only\">Loading...</span>\n" +
+		"  </div>\n" +
+		"</div>");
 
-        $( "#bodyChat" ).empty(); // Vaciar la tabla
-        for (i = 0; i < messagesList.length; i++) {
-            if (messagesList[i].from == (idSelectedUserId)) {
-                $("#bodyChat").append(
-                    "<tr id=" + messagesList[i]._id + ">" +
-                    "<td>" + messagesList[i].text + "</td>" +
-                    "<td> </td>" +
-                    "</tr>");
-            }
-            else {
-                $("#bodyChat").append(
-                    "<tr id=" + messagesList[i]._id + ">" +
-                    "<td> </td>" +
-                    "<td>" + messagesList[i].text + "</td>" +
-                    "</tr>");
-            }
-        }
-    }
+	function loadMessages() {
+		// We save the active user when loaded the messages to compare later
+		var requesterId = idSelectedUserId;
+		$.ajax({
+			url: URLbase + "/chat/" + requesterId,
+			type: "GET",
+			data: {},
+			dataType: 'json',
+			headers: {"token": token},
+			success: function (response) {
+				if (requesterId === idSelectedUserId)           // Update only if the user is the same
+					if (response.length > numberOfMessages)     // Update only if there are any new messages
+						updateChat(response);
+					else                                        // If the user changed, we reset the messages
+						numberOfMessages = -1;
+			},
+			error: function (error) {
+				$("#contenedor-principal").load("widget-login.html");
+			}
+		});
+	}
 
-    function sendMessage(){
+	function updateChat(messagesList) {
+		// When updating the chat we save the number of messages to know when to update again
+		numberOfMessages = messagesList.length;
+		$("#chat-history").empty(); // Vaciar la tabla
+		for (i = 0; i < messagesList.length; i++) {
+			if (messagesList[i].from === (idSelectedUserId)) {
+				// If the id is the friend's id, it is and incoming message
+				$("#chat-history").append(
+					"<div class=\"incoming_msg\" id=\"" + messagesList[i]._id + "\">\n" +
+					"<div class=\"received_msg\">\n" +
+					"<div class=\"received_withd_msg\">\n" +
+					"<p>" + messagesList[i].text + "</p>\n" +
+					"<span class=\"time_date\"> 11:01 AM    |    June 9</span></div>\n" +
+					"</div>\n" +
+					"</div>"
+				);
+			} else {
+				// If not, it is an outgoing message
+				$("#chat-history").append(
+					"<div class=\"outgoing_msg\" id=\"" + messagesList[i]._id + "\">\n" +
+					"<div class=\"sent_msg\">\n" +
+					"<p>" + messagesList[i].text + "</p>\n" +
+					"<span class=\"time_date\"> 11:01 AM    |    June 9</span> </div>\n" +
+					"</div>");
+			}
+		}
+	}
 
-        $.ajax({
-            url: URLbase + "/message",
-            type: "POST",
-            data: {
-                to : idSelectedUserId,
-                text : $("#message-text").val()
-            },
-            dataType: 'json',
-            headers: { "token": token },
-            success: function (respuesta) {
-                console.log("YAY");
-            },
-            error : function (error) {
-                $( "#contenedor-principal" ).load("widget-login.html");
-            }
-        })
-    }
+	function sendMessage() {
+		// We save the message to send it
+        var message = $("#message-text").val();
+		$.ajax({
+			url: URLbase + "/message",
+			type: "POST",
+			data: {
+				to: idSelectedUserId,
+				text: message
+			},
+			dataType: 'json',
+			headers: {"token": token},
+			success: function (respuesta) {
+				console.log("YAY");
+			},
+			error: function (error) {
+				$("#contenedor-principal").load("widget-login.html");
+			}
+		});
+		// We clear the text field
+		$("#message-text").val("");
+	}
 
-    clearInterval();
-    setInterval('loadMessages()',1000);
+	clearInterval();
+	setInterval('loadMessages()', 1000);
 
 </script>
