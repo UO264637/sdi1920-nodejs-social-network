@@ -61,6 +61,8 @@ module.exports = function(app, dbManager) {
                                 unread++;
                             }
                         }
+
+                        user.lastMessage = messages[messages.length-1] == undefined ? 0: messages[messages.length-1].date;
                         user.unread = unread;
                         res.send(JSON.stringify(user));
                     }

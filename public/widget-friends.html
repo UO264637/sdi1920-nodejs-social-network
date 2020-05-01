@@ -51,7 +51,7 @@
                         headers: {"token": token},
                         success: function (response2) {
                             friends.push(response2);
-                            updateTable(friends);
+                            sortFriends();
                         },
                         error: function (error) {
                             $("#contenedor-principal").load("widget-login.html");
@@ -96,7 +96,16 @@
         $( "#chat-container" ).load( "widget-chat.html");
     }
 
+    function sortFriends(){
+        friends.sort(function (a, b) {
+            if (a.lastMessage < b.lastMessage) return 1;
+            if (a.lastMessage > b.lastMessage) return -1;
+            return 0;
+        });
+        updateTable(friends);
+    }
+
     loadFriends();
-    //setInterval('loadFriends()', 3000);
+    setInterval('loadFriends()', 6000);
 
 </script>
