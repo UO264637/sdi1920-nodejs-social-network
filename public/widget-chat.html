@@ -46,6 +46,9 @@
 		"  </div>\n" +
 		"</div>");
 
+    /**
+     * Loads the messages of the conversation between the active user and the selected friend
+     */
 	function loadMessages() {
 		// We save the active user when loaded the messages to compare later
 		var requesterId = idSelectedUserId;
@@ -58,21 +61,7 @@
 			success: function (response) {
 				if (requesterId === idSelectedUserId)           // Update only if the user is the same
 					if (response.length > numberOfMessages) {    // Update only if there are any new messages
-                        for (let i = 0; i < response.length; i++) {
-                            if (!response[i].read && response[i].from == idSelectedUserId) { // Only the ones that are not read and that are sent to the user (not send by him)
-                                $.ajax({
-                                    url: URLbase + "/read/" + response[i]._id,
-                                    type: "PUT",
-                                    data: {},
-                                    dataType: 'json',
-                                    headers: {"token": token},
-                                    success: function (respuesta) {
-                                    },
-                                    error: function (error) {
-                                    }
-                                })
-                            }
-                        }
+                        markAsRead(response, idSelectedUserId);
                         updateChat(response);
                     }
 					else                                        // If the user changed, we reset the messages
@@ -84,6 +73,9 @@
 		});
 	}
 
+	/**
+     *  Prints the chat messages in the chat history
+     */
 	function updateChat(messagesList) {
 		// When updating the chat we save the number of messages to know when to update again
 		numberOfMessages = messagesList.length;
@@ -119,6 +111,9 @@
 		}
 	}
 
+    /**
+     *  Sends the entered message to the friend
+     */
 	function sendMessage() {
 		// We save the message to send it
         var message = $("#message-text").val();
@@ -141,6 +136,28 @@
 		// We clear the text field
 		$("#message-text").val("");
 	}
+
+	/**
+     * Selects the incoming messages not yet read and marks them as red
+	 * @param response              response with with messages
+	 * @param idSelectedUserId      friend
+	 */
+	function markAsRead(response) {
+		for (let i = 0; i < response.length; i++) {
+			// Only the ones that are not read and that are sent to the user (not send by him)
+			if (!response[i].read && response[i].from === idSelectedUserId) {
+				$.ajax({
+					url: URLbase + "/read/" + response[i]._id,
+					type: "PUT",
+					data: {},
+					dataType: 'json',
+					headers: {"token": token},
+					success: function (respuesta) { },
+					error: function (error) { }
+				})
+			}
+		}
+    }
 
 	clearInterval();
 	setInterval('loadMessages()', 1000);

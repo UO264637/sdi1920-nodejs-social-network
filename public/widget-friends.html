@@ -8,7 +8,7 @@
                 <div class="srch_bar">
                     <div class="stylish-input-group">
                         <input type="text" class="search-bar"  placeholder="Search"
-                               id="name-filter">
+                               id="name-filter" onchange="updateList()">
                         <i class="fa fa-search"></i>
                     </div>
                 </div>
@@ -23,41 +23,43 @@
 
 <script>
     window.history.pushState("", "", "/cliente.html?w=friends");
-    var friends = [];
+
+    var friends = [];                       // Array of friends
+    var lastUnread = -1;                    // Last number of unread messages, to know when to update the list
+
+	var idSelectedUserId;                   // ID of the friend with the open chat
+	var idSelectedUserName;                 // Name of the friend with the open chat
 
 	/**
-	 * Event listener to make the search when any key is entered
-	 */
-	$("#name-filter").keyup(function (e) {
-		filter();
-	});
-
+     * Loads the friends of the user
+     */
     function loadFriends(){
-        friends = [];
-        $.ajax({                        // Get list of friends ids
+        let loadedfriends = [];
+        // Asks the API for the list of friend IDs
+        $.ajax({
             url: URLbase + "/friends",
             type: "GET",
             data: { },
             dataType: 'json',
             headers: { "token": token },
             success: function(response) {
-                console.log(response);
-                for (i = 0; i < response.length; i++) {
-                    $.ajax({                                // Get info of each friend
-                        url: URLbase + "/user/" + response[i],
-                        type: "GET",
-                        data: {},
-                        dataType: 'json',
-                        headers: {"token": token},
-                        success: function (response2) {
-                            friends.push(response2);
-                            sortFriends();
-                        },
-                        error: function (error) {
-                            $("#contenedor-principal").load("widget-login.html");
-                        }
-                    });
-                }
+            	// When received, asks the API for the info of each friend and collect the promises
+				let gFriend = response.map((f) => {
+            		return $.get({
+						url: URLbase + "/user/" + f,
+						data: {},
+						dataType: 'json',
+						headers: {"token": token},
+						success: function (response2) {
+							loadedfriends.push(response2);
+						},
+						error: function (error) {
+							$("#contenedor-principal").load("widget-login.html");
+						}
+						});
+                });
+				// When all the promises are finished, checks if an update is needed with the friends loaded
+            	$.when.apply($, gFriend).done(() => { checkUpdate(loadedfriends)});
             },
             error : function (error){
                 $( "#contenedor-principal" ).load("widget-login.html");
@@ -65,18 +67,36 @@
         });
     }
 
-    function updateTable(friendsList){
+    /**
+     * Checks the given list, if there are new (or less) unread messages, updates the friends list
+     */
+    function checkUpdate(loadedfriends) {
+    	let unread = loadedfriends.map((f) => f.unread).reduce((accumulator, currentValue) => accumulator + currentValue,0);
+		if (unread !== lastUnread) {
+			lastUnread = unread;
+			friends = loadedfriends;
+    		updateList();
+        }
+    }
+
+    /**
+     * Clears and fills the list of friends
+     */
+    function fillList(friendsList){
         $( "#bodyFriends" ).empty(); // Vaciar la tabla
         for (i = 0; i < friendsList.length; i++) {
             $( "#bodyFriends" ).append(
                     	"<a onclick=chat('"+friendsList[i]._id+"',\"" + friendsList[i].name +"\")>" +
-                    	"<div class=\"chat_list\" id=\"" + friendsList[i]._id + "\">\n" +
-						"<div class=\"chat_people\">\n" +
+                    	"<div class=\"chat_list d-flex\" id=\"" + friendsList[i]._id + "\">\n" +
+						"<div class=\"chat_people w-100\">\n" +
 						"<div class=\"chat_ib\">\n" +
-						"<h5>" + friendsList[i].name + " " + friendsList[i].surname + " " + friendsList[i].unread + "</h5>\n" +
-                        "<p>" + friendsList[i].email + "</p>" +
-						"</div>\n</div>\n</div>\n</a>");
+						"<h5>" + friendsList[i].name + " " + friendsList[i].surname + "</h5>\n" +
+                        "<p>" + friendsList[i].email + "</p></div>\n</div>" +
+                        (friendsList[i].unread > 0 ?
+                            "<span class=\"badge badge-primary\"> " + friendsList[i].unread + " </span>" : "") +
+                        "</div>\n</a>");
         }
+		$( "#" + idSelectedUserId).addClass("active_chat");
     }
 
 	/**
@@ -85,24 +105,36 @@
 	function filter() {
 		var filterName = $("#name-filter").val().toLowerCase();
 		var filteredFriends = friends.filter((f) => f.name.toLowerCase().includes(filterName));
-		updateTable(filteredFriends);
+		fillList(filteredFriends);
     }
 
-    function chat(_id, name) {
-        idSelectedUserId = _id;
+	/**
+     * Opens the chat with the specified user
+	 * @param _id       id of the user with whom open the chat
+	 * @param name      name of the user
+	 */
+	function chat(_id, name) {
+		// Sets the id and name so widget-chat can read that info
+		idSelectedUserId = _id;
         idSelectedUserName = name;
+        // Changes the active chat in the list of friends
         $( ".chat_list").removeClass("active_chat");
-        $( "#" + _id).addClass("active_chat");
+		$( "#" + idSelectedUserId).addClass("active_chat");
+		// Loads the widget-chat
         $( "#chat-container" ).load( "widget-chat.html");
     }
 
-    function sortFriends(){
+	/**
+     * Updates the list of friends, sorts them based on their last message sent and calls for the filter
+	 */
+	function updateList(){
         friends.sort(function (a, b) {
             if (a.lastMessage < b.lastMessage) return 1;
             if (a.lastMessage > b.lastMessage) return -1;
             return 0;
         });
-        updateTable(friends);
+        // When sorted
+        filter();
     }
 
     loadFriends();

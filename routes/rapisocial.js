@@ -48,7 +48,7 @@ module.exports = function(app, dbManager) {
                     } else {
                         res.status(200);
                         let user;
-                        if (users[0].email == res.user) {
+                        if (users[0].email === res.user) {
                             user = users[1];
                         }
                         else {
@@ -57,12 +57,12 @@ module.exports = function(app, dbManager) {
 
                         let unread = 0;
                         for (let i = 0; i < messages.length; i++) {
-                            if (!messages[i].read) {
+                            if (!messages[i].read && messages[i].from.toString() === user._id.toString()) {
                                 unread++;
                             }
                         }
 
-                        user.lastMessage = messages[messages.length-1] == undefined ? 0: messages[messages.length-1].date;
+                        user.lastMessage = messages[messages.length-1] === undefined ? 0 : messages[messages.length-1].date;
                         user.unread = unread;
                         res.send(JSON.stringify(user));
                     }
@@ -102,7 +102,7 @@ module.exports = function(app, dbManager) {
 
     /*****************************************************************************\
                                             POST
-     \*****************************************************************************/
+    \*****************************************************************************/
 
     app.post("/api/login/", function (req, res) {
         let password = app.encrypt(req.body.password);
@@ -172,14 +172,14 @@ module.exports = function(app, dbManager) {
 
     /*****************************************************************************\
                                             PUT
-     \*****************************************************************************/
+    \*****************************************************************************/
 
     app.put("/api/read/:id", function(req, res) {
         dbManager.get("users", {email: res.user}, function(users) {
             if (users == null) {
                 res.status(500);
                 res.json({
-                    error: "An error has ocurred"
+                    error: "An error has occurred"
                 })
             } else {
                 let query = {
@@ -194,20 +194,20 @@ module.exports = function(app, dbManager) {
                     if (result == null) {
                         res.status(500);
                         res.json({
-                            error: "An error has ocurred"
+                            error: "An error has occurred"
                         })
                     } else {
-                        if (result.result.nModified == 0) {
+                        if (result.result.nModified === 0) {
                             res.status(403);
                             res.json({
-                                mensaje: "Message not modified",
+                                message: "Message not modified",
                                 _id: req.params.id
                             })
                         }
                         else {
                             res.status(200);
                             res.json({
-                                mensaje: "Message modified",
+                                message: "Message modified",
                                 _id: req.params.id
                             })
                         }
