@@ -33,15 +33,17 @@
 	});
 
     function loadFriends(){
-        $.ajax({
+        friends = [];
+        $.ajax({                        // Get list of friends ids
             url: URLbase + "/friends",
             type: "GET",
             data: { },
             dataType: 'json',
             headers: { "token": token },
             success: function(response) {
+                console.log(response);
                 for (i = 0; i < response.length; i++) {
-                    $.ajax({
+                    $.ajax({                                // Get info of each friend
                         url: URLbase + "/user/" + response[i],
                         type: "GET",
                         data: {},
@@ -66,12 +68,12 @@
     function updateTable(friendsList){
         $( "#bodyFriends" ).empty(); // Vaciar la tabla
         for (i = 0; i < friendsList.length; i++) {
-                    $( "#bodyFriends" ).append(
+            $( "#bodyFriends" ).append(
                     	"<a onclick=chat('"+friendsList[i]._id+"',\"" + friendsList[i].name +"\")>" +
                     	"<div class=\"chat_list\" id=\"" + friendsList[i]._id + "\">\n" +
 						"<div class=\"chat_people\">\n" +
 						"<div class=\"chat_ib\">\n" +
-						"<h5>" + friendsList[i].name + " " + friendsList[i].surname + "</h5>\n" +
+						"<h5>" + friendsList[i].name + " " + friendsList[i].surname + " " + friendsList[i].unread + "</h5>\n" +
                         "<p>" + friendsList[i].email + "</p>" +
 						"</div>\n</div>\n</div>\n</a>");
         }
@@ -95,5 +97,6 @@
     }
 
     loadFriends();
+    //setInterval('loadFriends()', 3000);
 
 </script>

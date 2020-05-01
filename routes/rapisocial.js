@@ -21,7 +21,10 @@ module.exports = function(app, dbManager) {
     });
 
     app.get("/api/user/:id", function (req, res) {
-        var query = { "_id" : dbManager.mongo.ObjectID(req.params.id)};
+        var query = { $or: [
+                {"_id" : dbManager.mongo.ObjectID(req.params.id)},
+                {"email" : res.user}
+            ]};
 
         dbManager.get("users", query,function(users){
             if ( users == null ){
@@ -30,8 +33,38 @@ module.exports = function(app, dbManager) {
                     error : "An error has ocurred"
                 })
             } else {
-                res.status(200);
-                res.send( JSON.stringify(users[0]));
+                 var query2 = { $or:[
+                        {"to" : dbManager.mongo.ObjectID(users[1]._id),
+                            "from" : dbManager.mongo.ObjectID(users[0]._id)},
+                        {"to" : dbManager.mongo.ObjectID(users[0]._id),
+                            "from" : dbManager.mongo.ObjectID(users[1]._id)}
+                    ]};
+                dbManager.get("messages", query2,function(messages){
+                    if ( messages == null ){
+                        res.status(500);
+                        res.json({
+                            error : "An error has ocurred"
+                        })
+                    } else {
+                        res.status(200);
+                        let user;
+                        if (users[0].email == res.user) {
+                            user = users[1];
+                        }
+                        else {
+                            user = users[0];
+                        }
+
+                        let unread = 0;
+                        for (let i = 0; i < messages.length; i++) {
+                            if (!messages[i].read) {
+                                unread++;
+                            }
+                        }
+                        user.unread = unread;
+                        res.send(JSON.stringify(user));
+                    }
+                });
             }
         });
     });
