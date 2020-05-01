@@ -57,8 +57,24 @@
 			headers: {"token": token},
 			success: function (response) {
 				if (requesterId === idSelectedUserId)           // Update only if the user is the same
-					if (response.length > numberOfMessages)     // Update only if there are any new messages
-						updateChat(response);
+					if (response.length > numberOfMessages) {    // Update only if there are any new messages
+                        for (let i = 0; i < response.length; i++) {
+                            if (!response[i].read && response[i].from == idSelectedUserId) { // Only the ones that are not read and that are sent to the user (not send by him)
+                                $.ajax({
+                                    url: URLbase + "/read/" + response[i]._id,
+                                    type: "PUT",
+                                    data: {},
+                                    dataType: 'json',
+                                    headers: {"token": token},
+                                    success: function (respuesta) {
+                                    },
+                                    error: function (error) {
+                                    }
+                                })
+                            }
+                        }
+                        updateChat(response);
+                    }
 					else                                        // If the user changed, we reset the messages
 						numberOfMessages = -1;
 			},
