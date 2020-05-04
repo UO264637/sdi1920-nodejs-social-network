@@ -50,7 +50,9 @@ module.exports = {
 			});}
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
-				return db.collection(collection).insert(input);
+				let promise = db.collection(collection).insert(input);
+				db.close;
+				return promise;
 			}).catch((err) => console.error(err));
 		}
 	},
@@ -76,7 +78,9 @@ module.exports = {
 			}); }
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
-				return db.collection(collection).find(query).toArray();
+				let promise = db.collection(collection).find(query).toArray();
+				db.close;
+				return promise;
 			}).catch((err) => console.error(err));
 		}
 	},
@@ -123,7 +127,9 @@ module.exports = {
 			});}
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
-				return db.collection(collection).update(query, {$set: input});
+				let promise = db.collection(collection).update(query, {$set: input});
+				db.close;
+				return promise;
 			}).catch((err) => console.error(err));
 		}
 	},
@@ -149,7 +155,9 @@ module.exports = {
 			});}
 		else { 						// Without callback the function returns a promise
 			return this.mongo.MongoClient.connect(this.app.get("db"), null).then((db) => {
-				return db.collection(collection).remove(query);
+				let promise = db.collection(collection).remove(query);
+				db.close;
+				return promise;
 			}).catch((err) => console.error(err));
 		}
 	},
