@@ -96,7 +96,6 @@ let tokenChecker = (req, res, next) => {
 				access : false,
 				error: "Invalid or timed out token"
 			});
-			return;
 		} else {
 			res.user = infoToken.user;
 			next();
@@ -207,6 +206,17 @@ app.get("/", logAccess, (req, res) => {
 });
 
 /**
+ * Displays the error page when trying any unavailable resource
+ */
+app.use(function (err, req, res, next) {
+	let error = {
+		status: 400,
+		message: "Not available resource"
+	};
+	res.send(swig.renderFile('views/error.html', {error}));
+});
+
+/**
  * Resets the database and notifies it back
  * ONLY FOR TESTING PURPOSES, DELETE BEFORE DEPLOYMENT
  */
@@ -214,6 +224,13 @@ app.get("/reset", (req, res) => {
 	// Calls the reset operation with the parsed file of default data
 	dbManager.reset(JSON.parse(fs.readFileSync("config/defaultdb.json")));
 	res.send("Database reset invoked");
+});
+
+/**
+ * 404 page
+ */
+app.get('*', function(req, res){
+	res.send(swig.renderFile('views/404.html', {}));
 });
 
 /*****************************************************************************\
