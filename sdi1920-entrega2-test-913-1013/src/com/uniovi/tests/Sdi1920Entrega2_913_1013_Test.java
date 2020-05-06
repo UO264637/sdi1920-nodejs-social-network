@@ -16,12 +16,12 @@ import com.uniovi.tests.pageobjects.*;
 public class Sdi1920Entrega2_913_1013_Test {
 	
 	// CARMEN
-//	static String PathFirefox65 = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
-//	static String Geckdriver024 = "D:\\UNI\\Tercero\\SDI\\Sesion 5\\Material\\geckodriver024win64.exe";
+	static String PathFirefox65 = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+	static String Geckdriver024 = "D:\\UNI\\Tercero\\SDI\\Sesion 5\\Material\\geckodriver024win64.exe";
 
 	// RICHI
-	static String PathFirefox65 = "D:\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "E:\\Clase\\SDI\\Material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+//	static String PathFirefox65 = "D:\\Mozilla Firefox\\firefox.exe";
+//	static String Geckdriver024 = "E:\\Clase\\SDI\\Material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024); 
 	static String URL = "http://localhost:8081";
@@ -174,15 +174,24 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR05() {
-		assertTrue("PR05 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		// We log in and check we are in the Users page
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");		
 	}
 	
 	/**
 	 * PR06 - Login with invalid data, standard user, empty email and password
+	 * 
+	 * The required of those inputs, won't let us advance to the next page, so we check we still are on Login
 	 */
 	@Test
 	public void PR06() {
-		assertTrue("PR06 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		// We try to log in
+		PO_LoginView.fillForm(driver, "", "");
+		// Check the user is still in the login
+		PO_UsersView.checkNoText(driver, "Surname");
+		PO_LoginView.checkElement(driver, "text", "Welcome to MySocialNetwork");
 	}
 	
 	/**
@@ -190,7 +199,12 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR07() {
-		assertTrue("PR07 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		// We try to log in
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "456");
+		// Check there is a warning
+		PO_LoginView.checkElement(driver, "class", "alert-warning");
+		PO_LoginView.checkElement(driver, "text", "Incorrect");
 	}	
 	
 	/**
@@ -198,7 +212,12 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR08() {
-		assertTrue("PR08 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		// We try to log in
+		PO_LoginView.fillForm(driver, "palomar@kholin.com", "123");
+		// Check there is a warning
+		PO_LoginView.checkElement(driver, "class", "alert-warning");
+		PO_LoginView.checkElement(driver, "text", "Incorrect");			
 	}	
 	
 	/********************************************************************************\
@@ -210,7 +229,15 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR09() {
-		assertTrue("PR09 sin hacer", false);			
+		PO_LoginView.checkElement(driver, "id", "email");
+		// We log in
+		PO_LoginView.logAs(driver, "dalinar@kholin.com", "123");	
+		// Log out
+		PO_LoginView.checkElement(driver, "text", "Logout");
+		PO_UsersView.logOut(driver);
+		// Check we are back in log in
+		PO_LoginView.checkElement(driver, "text", "Welcome to MySocialNetwork");
+		PO_LoginView.checkElement(driver, "id", "email");
 	}	
 	
 	/**
@@ -218,7 +245,7 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR10() {
-		assertTrue("PR10 sin hacer", false);			
+		PO_UsersView.checkNoText(driver, "Logout");			
 	}	
 	
 	/********************************************************************************\
@@ -615,7 +642,15 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR23() {
-		assertTrue("PR23 sin hacer", false);			
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+		
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+		
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
 	}	
 	
 	/**
@@ -623,7 +658,17 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR24() {
-		assertTrue("PR24 sin hacer", false);			
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+				
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "palomar@kholin.com", "123");
+				
+		// Check we are in the Friends list
+		PO_View.checkNoText(driver, "Friends");
+		// And a warning shows
+		PO_View.checkNoText(driver, "User not fond");	
 	}	
 	
 	/********************************************************************************\
