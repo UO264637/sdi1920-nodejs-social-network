@@ -4,11 +4,17 @@ import org.junit.*;
 import org.junit.runners.MethodSorters;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 //Paquetes Selenium 
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.*;
+import com.uniovi.tests.util.SeleniumUtils;
 
 
 //Ordenamos las pruebas por el nombre del método
@@ -798,7 +804,7 @@ public class Sdi1920Entrega2_913_1013_Test {
 		WebElement button = driver.findElement(By.className("msg_send_btn"));
 		button.click();
 		
-		// Check de message appears
+		// Check the message appears
 		PO_View.checkElement(driver, "text", "New message");
 	}	
 	
@@ -814,6 +820,7 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR29() {
+		// FIRST USER (Dalinar)
 		// We go to the client URL
 		driver.navigate().to(URL + "/cliente.html");
 								
@@ -841,8 +848,39 @@ public class Sdi1920Entrega2_913_1013_Test {
 		WebElement button = driver.findElement(By.className("msg_send_btn"));
 		button.click();
 		
-		// Check de message appears
-		PO_View.checkElement(driver, "text", "New message");	
+		// Check the message appears
+		PO_View.checkElement(driver, "text", "Hello");
+		
+		// Check it is unread
+		Boolean resultado = 
+				(new WebDriverWait(driver, 2)).until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//*[contains(@class,'fa-eye')]")));
+		assertTrue(resultado);
+		
+		
+		
+		// SECOND USER (Renarin)
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+										
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "renarin@kholin.com", "123");
+												
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+				
+		// Select a chat
+		PO_View.checkElement(driver, "text", "Dalinar"); // Wait for the friend to appear
+		friend = driver.findElement(By.id("dalinar@kholin.com"));
+		friend.click();
+		
+		// Check the message appears
+		PO_View.checkElement(driver, "text", "Hello");		
+		
+		// Check it is read
+		WebElement readMessage = 
+				(new WebDriverWait(driver, 2)).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(@class,'fa-eye')]")));
+		assertTrue(readMessage != null);
 	}
 	
 	
@@ -856,10 +894,69 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR30() {
-		assertTrue("PR30 sin hacer", false);			
-	}
-	
-	
+		// FIRST USER (Dalinar)
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+										
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+												
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+				
+		// Select a chat
+		PO_View.checkElement(driver, "text", "Adolin"); // Wait for the friend to appear
+		WebElement friend = driver.findElement(By.id("adolin@kholin.com"));
+		friend.click();
+				
+		// Check the message does not exist
+		PO_View.checkNoText(driver, "New message");
+						
+		// Writte and send the messages
+		WebElement message = driver.findElement(By.id("message-text")); // First one
+		message.click();	
+		message.clear();
+		message.sendKeys("Hello");
+				
+		WebElement button = driver.findElement(By.className("msg_send_btn")); 
+		button.click();
+				
+		// Second one
+		message.click();	
+		message.clear();
+		message.sendKeys("How are you?");
+			
+		button.click();
+				
+		// Third one
+		message.click();	
+		message.clear();
+		message.sendKeys(":D");
+				
+		button.click();
+				
+		// Check the messages appear
+		PO_View.checkElement(driver, "text", "Hello");
+		PO_View.checkElement(driver, "text", "How are you?");
+		PO_View.checkElement(driver, "text", ":D");				
+				
+				
+		// SECOND USER (Adolin)
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+										
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "adolin@kholin.com", "123");
+														
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+						
+		// Check unread messages
+		PO_View.checkElement(driver, "text", "3");					
+
+	}	
 	/********************************************************************************\
 										C7 - ORDER BY RECENT
 	\********************************************************************************/
@@ -872,9 +969,58 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR31() {
-		assertTrue("PR31 sin hacer", false);			
-	}
-	
+		// FIRST USER (Dalinar)
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+												
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+														
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
 		
+		// Select the last friend (Jasnah)
+		List<WebElement> friends = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[contains(@class,'friend')]", 2);
+		friends.get(friends.size()-1).click();
+		
+		// Writte and send the message		
+		WebElement message = driver.findElement(By.id("message-text"));
+		message.click();	
+		message.clear();
+		message.sendKeys("Message for the last friend");
+						
+		WebElement button = driver.findElement(By.className("msg_send_btn")); 
+		button.click();
+		
+		// Show the friends again
+		driver.navigate().to(URL + "/cliente.html");
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+		PO_View.checkElement(driver, "text", "Friends");
+		
+		// Enter the first chat and see the message is there
+		friends = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[contains(@class,'friend')]", 2);
+		friends.get(0).click();
+		PO_View.checkElement(driver, "text", "Message for the last friend");
+		
+		
+		
+		// SECOND USER (Jasnah)
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+														
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "shallan@davar.com", "123");
+																
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+		
+		// Enter the first chat and see the message is there
+		friends = SeleniumUtils.EsperaCargaPaginaxpath(driver, "//*[contains(@class,'friend')]", 2);
+		friends.get(0).click();
+		PO_View.checkElement(driver, "text", "Message for the last friend");
+	}		
 }
 

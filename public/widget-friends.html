@@ -86,7 +86,7 @@
         $( "#bodyFriends" ).empty(); // Vaciar la tabla
         for (i = 0; i < friendsList.length; i++) {
             $( "#bodyFriends" ).append(
-                    	"<a  id='" + friendsList[i].email + "' onclick=chat('"+friendsList[i]._id+"',\"" + friendsList[i].name +"\")>" +
+                    	"<a  id='" + friendsList[i].email + "' class='friend' onclick=chat('"+friendsList[i]._id+"',\"" + friendsList[i].name +"\")>" +
                     	"<div class=\"chat_list d-flex\" id=\"" + friendsList[i]._id + "\">\n" +
 						"<div class=\"chat_people w-100\">\n" +
 						"<div class=\"chat_ib\">\n" +
