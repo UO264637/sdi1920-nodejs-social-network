@@ -680,7 +680,23 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR25() {
-		assertTrue("PR25 sin hacer", false);			
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+						
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+						
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+		// Check the friends appear
+		PO_View.checkElement(driver, "text", "Navani");	
+		PO_View.checkElement(driver, "text", "Elhokar");
+		PO_View.checkElement(driver, "text", "Kaladin");
+		PO_View.checkElement(driver, "text", "Adolin");
+		PO_View.checkElement(driver, "text", "Renarin");
+		PO_View.checkElement(driver, "text", "Shallan");
+		PO_View.checkElement(driver, "text", "Jasnah");
 	}	
 	
 	/**
@@ -688,7 +704,28 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR26() {
-		assertTrue("PR26 sin hacer", false);			
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+						
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+								
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+		
+		// Search by "Ka"
+		WebElement search = driver.findElement(By.id("name-filter"));
+		search.click();
+		search.clear();
+		search.sendKeys("Ka");
+		
+		By button = By.className("fa");
+		driver.findElement(button).click();
+		
+		// Check KAladin and ElhoKAr appear
+		PO_View.checkElement(driver, "text", "Elhokar");
+		PO_View.checkElement(driver, "text", "Kaladin");		
 	}	
 	
 	
@@ -697,11 +734,30 @@ public class Sdi1920Entrega2_913_1013_Test {
 	\********************************************************************************/
 
 	/**
-	 * PR27. Access the list of messages of a friend (chat), it must contain aat least three messages.
+	 * PR27. Access the list of messages of a friend (chat), it must contain at least three messages.
 	 */
 	@Test
 	public void PR27() {
-		assertTrue("PR27 sin hacer", false);			
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+								
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+										
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+		
+		// Select a chat
+		PO_View.checkElement(driver, "text", "Elhokar"); // Wait for the friend to appear
+		WebElement friend = driver.findElement(By.id("elhokar@kholin.com"));
+		friend.click();
+				
+		// Check chat appears ( I removed all the ' because it didn't find them correctly)
+		PO_View.checkElement(driver, "text", "Make me High Prince of War.");
+		PO_View.checkElement(driver, "text", "No, I can");
+		PO_View.checkElement(driver, "text", "I made Sadeas High Prince of Information");
+		PO_View.checkElement(driver, "text", "ll kill you");
 	}	
 	
 	
@@ -715,7 +771,35 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR28() {
-		assertTrue("PR28 sin hacer", false);			
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+								
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+										
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+		
+		// Select a chat
+		PO_View.checkElement(driver, "text", "Elhokar"); // Wait for the friend to appear
+		WebElement friend = driver.findElement(By.id("elhokar@kholin.com"));
+		friend.click();
+		
+		// Check the message does not exist
+		PO_View.checkNoText(driver, "New message");
+				
+		// Writte and send the message
+		WebElement message = driver.findElement(By.id("message-text"));
+		message.click();	
+		message.clear();
+		message.sendKeys("New message");
+		
+		WebElement button = driver.findElement(By.className("msg_send_btn"));
+		button.click();
+		
+		// Check de message appears
+		PO_View.checkElement(driver, "text", "New message");
 	}	
 	
 	
@@ -730,7 +814,35 @@ public class Sdi1920Entrega2_913_1013_Test {
 	 */
 	@Test
 	public void PR29() {
-		assertTrue("PR29 sin hacer", false);			
+		// We go to the client URL
+		driver.navigate().to(URL + "/cliente.html");
+								
+		// Log in
+		PO_LoginView.checkElement(driver, "id", "email");
+		PO_LoginView.fillForm(driver, "dalinar@kholin.com", "123");
+										
+		// Check we are in the Friends list
+		PO_View.checkElement(driver, "text", "Friends");
+		
+		// Select a chat
+		PO_View.checkElement(driver, "text", "Renarin"); // Wait for the friend to appear
+		WebElement friend = driver.findElement(By.id("renarin@kholin.com"));
+		friend.click();
+		
+		// Check the message does not exist
+		PO_View.checkNoText(driver, "New message");
+				
+		// Writte and send the message
+		WebElement message = driver.findElement(By.id("message-text"));
+		message.click();	
+		message.clear();
+		message.sendKeys("Hello");
+		
+		WebElement button = driver.findElement(By.className("msg_send_btn"));
+		button.click();
+		
+		// Check de message appears
+		PO_View.checkElement(driver, "text", "New message");	
 	}
 	
 	
