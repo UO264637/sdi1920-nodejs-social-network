@@ -12,7 +12,7 @@ aplicaciones distinguen entre el estado del usuario entre estar autenticado o no
 carecen de cualquier funcionalidad que no sea entrar en la aplicación. A continuación, mostramos los mapas de 
 navegación de ambos entornos.
 
-[Navigation map](https://i.imgur.com/ofXgJcD.png)
+![Navigation map](https://i.imgur.com/ofXgJcD.png)
 
 ## Aspectos técnicos y de diseño relevantes
 ### 1. Modelo
@@ -51,7 +51,7 @@ privilegios, empero, este acercamiento habría añadido una complejidad innecesa
 aplicación. Al final decidimos guardar los nombres como simples cadenas y que cada funcionalidad sea la que juzgue los 
 permisos en base a eso.
 
-[Model](https://i.imgur.com/idCmb2o.png)
+![Model](https://i.imgur.com/idCmb2o.png)
 
 ### 2. Roles
 
