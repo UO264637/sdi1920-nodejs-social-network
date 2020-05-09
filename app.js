@@ -7,7 +7,7 @@ let express = require("express");
 let app = express();
 let expressSession = require("express-session");
 app.use(expressSession({ 						// Sets the session
-	secret: "abcdefg",
+	secret: "sylphrena",
 	resave: true,
 	saveUninitialized: true
 }));
@@ -19,10 +19,8 @@ let swig = require("swig");
 let fs = require("fs");
 
 // Log4JS
-let log4js = require("log4js");
-let logger = log4js.getLogger();
+let logger = require("log4js").getLogger();
 logger.level = "debug";
-logger.debug("Some debug messages");
 
 // MongoDB
 let mongo = require("mongodb");
@@ -45,11 +43,30 @@ let jwt = require('jsonwebtoken');
 \*****************************************************************************/
 
 /**
- * Register the access of the user in the log
+ * Sets the headers
+ */
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Credentials", "true");
+	res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
+	next();
+});
+
+/**
+ * Registers the access of the user in the log
  */
 let logAccess = (req, res, next) => {
 	app.get("logger").info("%s attempted: %s %s",
 		req.session.user ? req.session.user : "Anonymous user", req.method,  req.originalUrl);
+	next();
+};
+
+/**
+ * Registers the api accesses of the user in the log
+ */
+let logApiAccess = (req, res, next) => {
+	app.get("logger").info(`${res.user} solicited: ${req.method} ${req.originalUrl}`);
 	next();
 };
 
@@ -78,7 +95,7 @@ let hasToken = (req, res, next) => {
 		res.status(403); // Forbidden
 		res.json({
 			access : false,
-			message: 'No Token'
+			message: "No Token"
 		});
 	}
 };
@@ -113,7 +130,7 @@ anonRouter.use(logAccess, anonChecker);
 
 // Checks the user token is valid
 let userTokenRouter = express.Router();
-userTokenRouter.use(hasToken, tokenChecker);
+userTokenRouter.use(hasToken, tokenChecker, logApiAccess);
 
 app.use("/login", anonRouter);				// Sets the access to the login (only anonymous)
 app.use("/signup", anonRouter);				// Sets the access to the register (only anonymous)
@@ -125,17 +142,7 @@ app.use("/api/user*", userTokenRouter);
 app.use("/users*", authRouter);				// Sets the access to the rest of the app (only auth)
 app.use("/requests*", authRouter);
 app.use("/friends*", authRouter);
-app.use(express.static("public"));			// Sets the static folder
-
-// Headers
-app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Credentials", "true");
-	res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
-	// Debemos especificar todas las headers que se aceptan. Content-Type , token
-	next();
-});
+app.use(express.static("public"));				// Sets the static folder
 
 
 /*****************************************************************************\
@@ -213,7 +220,7 @@ app.use(function (err, req, res, next) {
 		status: 400,
 		message: "Not available resource"
 	};
-	res.send(swig.renderFile('views/error.html', {error}));
+	res.send(swig.renderFile("views/error.html", {error}));
 });
 
 /**
@@ -229,7 +236,7 @@ app.get("/reset", (req, res) => {
 /**
  * 404 page
  */
-app.get('*', function(req, res){
+app.get("*", function(req, res){
 	res.send(swig.renderFile('views/404.html', {}));
 });
 

@@ -194,7 +194,7 @@ module.exports = {
 				if (users == null)
 					logger.error("An error has occurred inserting the users");
 				else {
-					users.forEach((u) => logger.info("Inserted user: " + u.email + " (" + u._id) + ")");
+					users.forEach((u) => logger.info(`Inserted user: ${u.email} (${u._id})`));
 					// Deletion of requests, when done inserts them again with ids instead of emails
 					this.clear("requests", (db) => {
 						// Change of the requests to hold the ids of the users
@@ -209,8 +209,7 @@ module.exports = {
 								logger.error("An error has occurred inserting the requests");
 							else {
 								results.forEach((r) =>
-									logger.info("Inserted request: {from:" + r.from + ", to: " + r.to + "} ("
-										+ r._id + ")"));
+									logger.info(`Inserted request: {from: ${r.from}, to: ${r.to}} (${r._id})`));
 							}
 						});
 						db.close();
@@ -226,7 +225,7 @@ module.exports = {
 							if (result == null)
 								logger.error("An error has occurred updating the users");
 							else
-								logger.info("Updated the user " + user.email + " (" + user._id + ")");
+								logger.info(`Updated the user ${user.email} (${user._id})`);
 						});
 					});
 					// Deletion of messages, when done inserts them again with ids instead of emails
@@ -243,8 +242,7 @@ module.exports = {
 								logger.error("An error has occurred inserting the messages");
 							else {
 								results.forEach((r) =>
-									logger.info("Inserted message: {from:" + r.from + ", to: " + r.to + "} ("
-										+ r._id + ")"));
+									logger.info(`Inserted message: {from: ${r.from}, to: ${r.to}} (${r._id})`));
 							}
 						});
 						db.close();

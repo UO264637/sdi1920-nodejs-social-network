@@ -22,12 +22,12 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class Sdi1920Entrega2_913_1013_Test {
 	
 	// CARMEN
-	static String PathFirefox65 = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "D:\\UNI\\Tercero\\SDI\\Sesion 5\\Material\\geckodriver024win64.exe";
+//	static String PathFirefox65 = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+//	static String Geckdriver024 = "D:\\UNI\\Tercero\\SDI\\Sesion 5\\Material\\geckodriver024win64.exe";
 
 	// RICHI
-//	static String PathFirefox65 = "D:\\Mozilla Firefox\\firefox.exe";
-//	static String Geckdriver024 = "E:\\Clase\\SDI\\Material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String PathFirefox65 = "D:\\Mozilla Firefox\\firefox.exe";
+	static String Geckdriver024 = "E:\\Clase\\SDI\\Material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024); 
 	static String URL = "http://localhost:8081";

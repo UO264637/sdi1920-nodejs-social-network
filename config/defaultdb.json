@@ -11,16 +11,6 @@
   ],
   "users": [
     {
-      "name": "Kame",
-      "surname": "Patata",
-      "email": "cocotero@amarillo",
-      "password": "123",
-      "role": "ADMIN",
-      "friends": [
-
-      ]
-    },
-    {
       "name": "Honor",
       "surname": "Adonalsium",
       "email": "admin@email.com",

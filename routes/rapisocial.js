@@ -11,7 +11,7 @@ module.exports = function(app, dbManager) {
             if ( users == null ){
                 res.status(500);
                 res.json({
-                    error : "An error has ocurred"
+                    error : "An error has occurred"
                 })
             } else {
                 res.status(200);
@@ -30,7 +30,7 @@ module.exports = function(app, dbManager) {
             if ( users == null ){
                 res.status(500);
                 res.json({
-                    error : "An error has ocurred"
+                    error : "An error has occurred"
                 })
             } else {
                  var query2 = { $or:[
@@ -43,7 +43,7 @@ module.exports = function(app, dbManager) {
                     if ( messages == null ){
                         res.status(500);
                         res.json({
-                            error : "An error has ocurred"
+                            error : "An error has occurred"
                         })
                     } else {
                         res.status(200);
@@ -76,7 +76,7 @@ module.exports = function(app, dbManager) {
             if ( users == null ){
                 res.status(500);
                 res.json({
-                    error : "An error has ocurred"
+                    error : "An error has occurred"
                 })
              } else {
                 var query = { $or:[
@@ -89,7 +89,7 @@ module.exports = function(app, dbManager) {
                     if ( messages == null ){
                         res.status(500);
                         res.json({
-                            error : "An error has ocurred"
+                            error : "An error has occurred"
                         })
                     } else {
                         res.status(200);
@@ -141,7 +141,7 @@ module.exports = function(app, dbManager) {
             if (users == null || users.length === 0) {
                 res.status(500); // Unauthorized
                 res.json({
-                    error: "An error has ocurred"
+                    error: "An error has occurred"
                 })
             } else {
                 message.from = users[0]._id;
@@ -150,7 +150,7 @@ module.exports = function(app, dbManager) {
                         if (id == null) {
                             res.status(500);
                             res.json({
-                                error: "An error has ocurred"
+                                error: "An error has occurred"
                             })
                         } else {
                             res.status(201);

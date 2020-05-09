@@ -99,7 +99,7 @@ module.exports = function(app, dbManager) {
 						res.redirect("/users");
 					}
 				});
-			}).catch((err) => {throw err});
+			})
 		}).catch((err) => {
 			// Error management
 			app.get("logger").error(err);
@@ -140,8 +140,8 @@ module.exports = function(app, dbManager) {
 				Promise.all([uUser, uUserToAdd, dRequest]).then(() => {
 					req.session.alerts = [{type: "success", msg: "You accepted the friendship successfully"}];
 					res.redirect("/requests");
-				}).catch((err) => {throw err});
-			}).catch((err) => {throw err});
+				})
+			})
 		}).catch((err) => {
 			// Error management
 			app.get("logger").error(err);

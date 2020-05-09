@@ -18,10 +18,8 @@
 </head>
 <body>
 
-
-<!-- Contenido -->
-<div class="container" id="contenedor-principal"> <!--  id para identificar -->
-
+<div class="container" id="contenedor-principal">
+    <!-- Widgets -->
 </div>
 
 <script>
@@ -30,23 +28,17 @@
 	var URLbase = "http://localhost:8081/api";
 	$("#contenedor-principal").load("widget-login.html");
 
-	if (Cookies.get('token') != null) {
-		token = Cookies.get('token');
+	if (Cookies.get("token") != null) {
+		token = Cookies.get("token");
 
 		var url = new URL(window.location.href);
 		var w = url.searchParams.get("w");
-		if (w == "login") {
+		if (w === "login") {
 			$("#contenedor-principal").load("widget-login.html");
 		}
-		if (w == "friends") {
+		if (w === "friends") {
 			$("#contenedor-principal").load("widget-friends.html");
 		}
-
-	}
-
-	function widgetFriends() {
-		clearInterval();
-		$("#contenedor-principal").load("widget-friends.html");
 	}
 </script>
 
