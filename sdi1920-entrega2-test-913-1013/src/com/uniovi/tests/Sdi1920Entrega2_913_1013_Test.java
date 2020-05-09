@@ -701,7 +701,6 @@ public class Sdi1920Entrega2_913_1013_Test {
 		PO_View.checkElement(driver, "text", "Kaladin");
 		PO_View.checkElement(driver, "text", "Adolin");
 		PO_View.checkElement(driver, "text", "Renarin");
-		PO_View.checkElement(driver, "text", "Shallan");
 		PO_View.checkElement(driver, "text", "Jasnah");
 	}	
 	
